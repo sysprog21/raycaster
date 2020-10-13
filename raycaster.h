@@ -2,7 +2,9 @@
 
 #include <stdint.h>
 
+/* specify the precalcuated tables */
 #define TABLES_320
+
 #define SCREEN_WIDTH (uint16_t) 320
 #define SCREEN_HEIGHT (uint16_t) 256
 #define SCREEN_SCALE 2
