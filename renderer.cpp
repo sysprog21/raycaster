@@ -1,5 +1,3 @@
-#define _USE_MATH_DEFINES
-
 #include "renderer.h"
 #include <math.h>
 #include "raycaster_data.h"
@@ -55,10 +53,3 @@ void Renderer::TraceFrame(Game *g, uint32_t *fb)
         }
     }
 }
-
-Renderer::Renderer(RayCaster *rc)
-{
-    _rc = rc;
-}
-
-Renderer::~Renderer() {}

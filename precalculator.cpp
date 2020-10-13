@@ -1,20 +1,18 @@
-#define _USE_MATH_DEFINES
-
 #include <math.h>
 #include <iostream>
 #include <sstream>
 
 #include "precalculator.h"
 
-#define LOOKUP_STORAGE
 #include "raycaster_tables.h"
 
 RayCasterPrecalculator::RayCasterPrecalculator() {}
 
 RayCasterPrecalculator::~RayCasterPrecalculator() {}
 
+#ifndef HAS_TABLES
 template <typename T>
-void DumpLookupTable(std::ostringstream &dump, T *t, int len)
+static void DumpLookupTable(std::ostringstream &dump, T *t, int len)
 {
     dump << "{";
     for (int i = 0; i < len; i++) {
@@ -26,6 +24,7 @@ void DumpLookupTable(std::ostringstream &dump, T *t, int len)
         }
     }
 }
+#endif
 
 void RayCasterPrecalculator::Precalculate()
 {

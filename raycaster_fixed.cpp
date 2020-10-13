@@ -2,8 +2,6 @@
 
 #include "raycaster_fixed.h"
 #include "raycaster_data.h"
-
-#define LOOKUP_STORAGE extern
 #include "raycaster_tables.h"
 
 // (v * f) >> 8

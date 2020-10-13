@@ -15,6 +15,6 @@ class Renderer
 
 public:
     void TraceFrame(Game *g, uint32_t *frameBuffer);
-    Renderer(RayCaster *rc);
-    ~Renderer();
+    Renderer(RayCaster *rc) { _rc = rc; };
+    ~Renderer(){};
 };

@@ -33,7 +33,7 @@ public:
                        uint16_t *textureY,
                        uint16_t *textureStep) = 0;
 
-    RayCaster();
+    RayCaster(){};
 
-    ~RayCaster();
+    ~RayCaster(){};
 };

@@ -1,7 +1,5 @@
 // floating-point implementation for testing/comparison
 
-#define _USE_MATH_DEFINES
-
 #include "raycaster_float.h"
 #include <math.h>
 

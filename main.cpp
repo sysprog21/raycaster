@@ -10,16 +10,60 @@
 #include "raycaster_float.h"
 #include "renderer.h"
 
-void DrawBuffer(SDL_Renderer *sdlRenderer,
-                SDL_Texture *sdlTexture,
-                uint32_t *frameBuffer,
-                int deltaX);
-bool ProcessEvent(const SDL_Event &event,
-                  int *moveDirection,
-                  int *rotateDirection);
-
 using namespace std;
 
+static void DrawBuffer(SDL_Renderer *sdlRenderer,
+                       SDL_Texture *sdlTexture,
+                       uint32_t *fb,
+                       int dx)
+{
+    int pitch = 0;
+    void *pixelsPtr;
+    if (SDL_LockTexture(sdlTexture, NULL, &pixelsPtr, &pitch)) {
+        throw runtime_error("Unable to lock texture");
+    }
+    memcpy(pixelsPtr, fb, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
+    SDL_UnlockTexture(sdlTexture);
+    SDL_Rect r;
+    r.x = dx * SCREEN_SCALE;
+    r.y = 0;
+    r.w = SCREEN_WIDTH * SCREEN_SCALE;
+    r.h = SCREEN_HEIGHT * SCREEN_SCALE;
+    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, &r);
+}
+
+static bool ProcessEvent(const SDL_Event &event,
+                         int *moveDirection,
+                         int *rotateDirection)
+{
+    if (event.type == SDL_QUIT) {
+        return true;
+    } else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) &&
+               event.key.repeat == 0) {
+        auto k = event.key;
+        auto p = event.type == SDL_KEYDOWN;
+        switch (k.keysym.sym) {
+        case SDLK_ESCAPE:
+            return true;
+            break;
+        case SDLK_UP:
+            *moveDirection = p ? 1 : 0;
+            break;
+        case SDLK_DOWN:
+            *moveDirection = p ? -1 : 0;
+            break;
+        case SDLK_LEFT:
+            *rotateDirection = p ? -1 : 0;
+            break;
+        case SDLK_RIGHT:
+            *rotateDirection = p ? 1 : 0;
+            break;
+        default:
+            break;
+        }
+    }
+    return false;
+}
 int main(int argc, char *args[])
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -88,57 +132,4 @@ int main(int argc, char *args[])
 
     SDL_Quit();
     return 0;
-}
-
-void DrawBuffer(SDL_Renderer *sdlRenderer,
-                SDL_Texture *sdlTexture,
-                uint32_t *fb,
-                int dx)
-{
-    int pitch = 0;
-    void *pixelsPtr;
-    if (SDL_LockTexture(sdlTexture, NULL, &pixelsPtr, &pitch)) {
-        throw runtime_error("Unable to lock texture");
-    }
-    memcpy(pixelsPtr, fb, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
-    SDL_UnlockTexture(sdlTexture);
-    SDL_Rect r;
-    r.x = dx * SCREEN_SCALE;
-    r.y = 0;
-    r.w = SCREEN_WIDTH * SCREEN_SCALE;
-    r.h = SCREEN_HEIGHT * SCREEN_SCALE;
-    SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, &r);
-}
-
-bool ProcessEvent(const SDL_Event &event,
-                  int *moveDirection,
-                  int *rotateDirection)
-{
-    if (event.type == SDL_QUIT) {
-        return true;
-    } else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) &&
-               event.key.repeat == 0) {
-        auto k = event.key;
-        auto p = event.type == SDL_KEYDOWN;
-        switch (k.keysym.sym) {
-        case SDLK_ESCAPE:
-            return true;
-            break;
-        case SDLK_UP:
-            *moveDirection = p ? 1 : 0;
-            break;
-        case SDLK_DOWN:
-            *moveDirection = p ? -1 : 0;
-            break;
-        case SDLK_LEFT:
-            *rotateDirection = p ? -1 : 0;
-            break;
-        case SDLK_RIGHT:
-            *rotateDirection = p ? 1 : 0;
-            break;
-        default:
-            break;
-        }
-    }
-    return false;
 }
