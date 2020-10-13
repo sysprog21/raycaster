@@ -93,10 +93,10 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
                                        uint8_t *textureNo,
                                        uint8_t *textureX)
 {
-    register int8_t tileStepX;
-    register int8_t tileStepY;
-    register int16_t interceptX = rayX;
-    register int16_t interceptY = rayY;
+    int8_t tileStepX;
+    int8_t tileStepY;
+    int16_t interceptX = rayX;
+    int16_t interceptY = rayY;
 
     const uint8_t quarter = rayA >> 8;
     const uint8_t angle = rayA % 256;

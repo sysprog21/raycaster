@@ -6,7 +6,6 @@
 class Renderer
 {
     RayCaster *_rc;
-    Game *_g;
 
     inline static uint32_t GetARGB(uint8_t brightness)
     {

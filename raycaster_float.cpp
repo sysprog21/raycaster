@@ -86,8 +86,6 @@ float RayCasterFloat::Distance(float playerX,
     bool verticalHit = false;
     bool horizontalHit = false;
     bool somethingDone = false;
-    int isTop = 0;
-    int isRight = 0;
 
     do {
         somethingDone = false;
