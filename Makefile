@@ -16,6 +16,15 @@ else
     VECHO = @printf
 endif
 
+GIT_HOOKS := .git/hooks/applied
+.PHONY: all clean
+
+all: $(GIT_HOOKS) $(BIN)
+
+$(GIT_HOOKS):
+	@scripts/install-git-hooks
+	@echo
+	
 OBJS := \
 	game.o \
 	raycaster_fixed.o \
