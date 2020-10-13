@@ -3,7 +3,6 @@
 #include <sstream>
 
 #include "precalculator.h"
-
 #include "raycaster_tables.h"
 
 RayCasterPrecalculator::RayCasterPrecalculator() {}

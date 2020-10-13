@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "game.h"
-#include "precalculator.h"
 #include "raycaster.h"
 #include "raycaster_fixed.h"
 #include "raycaster_float.h"
@@ -100,8 +99,6 @@ int main(int argc, char *args[])
             SDL_Texture *floatTexture = SDL_CreateTexture(
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-            RayCasterPrecalculator::Precalculate();
 
             while (!isExiting) {
                 floatRenderer.TraceFrame(&game, floatBuffer);

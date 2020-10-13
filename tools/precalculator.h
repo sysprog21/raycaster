@@ -1,7 +1,5 @@
 #pragma once
 
-#include "raycaster.h"
-
 class RayCasterPrecalculator
 {
 public:
