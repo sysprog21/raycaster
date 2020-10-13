@@ -68,10 +68,11 @@ int main(int argc, char *args[])
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     } else {
-        SDL_Window *sdlWindow = SDL_CreateWindow(
-            "RayCaster", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            SCREEN_SCALE * (SCREEN_WIDTH * 2 + 1), SCREEN_SCALE * SCREEN_HEIGHT,
-            SDL_WINDOW_SHOWN);
+        SDL_Window *sdlWindow =
+            SDL_CreateWindow("RayCaster [fixed-point vs. floating-point]",
+                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                             SCREEN_SCALE * (SCREEN_WIDTH * 2 + 1),
+                             SCREEN_SCALE * SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
         if (sdlWindow == NULL) {
             printf("Window could not be created! SDL_Error: %s\n",
