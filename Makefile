@@ -3,9 +3,8 @@ BIN = main
 CXXFLAGS = -std=c++11 -O2 -Wall -g
 
 # SDL
-CXXFLAGS += -I /usr/local/include/SDL2 # macOS
-CXXFLAGS += -I /usr/include/SDL2 # GNU/Linux
-LDFLAGS = -L /usr/local/lib/ -lSDL2
+CXXFLAGS += `sdl2-config --cflags`
+LDFLAGS += `sdl2-config --libs`
 
 # Control the build verbosity
 ifeq ("$(VERBOSE)","1")
