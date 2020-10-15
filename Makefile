@@ -41,5 +41,6 @@ $(BIN): $(OBJS)
 	$(Q)$(CXX)  -o $@ $^ $(LDFLAGS)
 
 clean:
-	$(RM) $(BIN) $(OBJS)
-	$(RM) $(deps)
+	$(RM) $(BIN) $(OBJS) $(deps)
+
+-include $(deps)
