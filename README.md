@@ -1,4 +1,4 @@
-# RayCaster
+# raycaster
 A efficient and lean implementation of the [ray casting](https://en.wikipedia.org/wiki/Ray_casting) algorithm.
 
 ## Features
