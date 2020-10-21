@@ -3,7 +3,7 @@
 #include "raycaster_float.h"
 #include <math.h>
 
-bool RayCasterFloat::IsWall(float rayX, float rayY, float rayA)
+bool RayCasterFloat::IsWall(float rayX, float rayY)
 {
     float mapX = 0;
     float mapY = 0;
@@ -93,7 +93,7 @@ float RayCasterFloat::Distance(float playerX,
                 (tileStepY == -1 && (interceptY >= tileY)))) {
             somethingDone = true;
             tileX += tileStepX;
-            if (IsWall(tileX, interceptY, rayA)) {
+            if (IsWall(tileX, interceptY)) {
                 verticalHit = true;
                 rayX = tileX + (tileStepX == -1 ? 1 : 0);
                 rayY = interceptY;
@@ -107,7 +107,7 @@ float RayCasterFloat::Distance(float playerX,
                                 (tileStepX == -1 && (interceptX >= tileX)))) {
             somethingDone = true;
             tileY += tileStepY;
-            if (IsWall(interceptX, tileY, rayA)) {
+            if (IsWall(interceptX, tileY)) {
                 horizontalHit = true;
                 rayX = interceptX;
                 *hitOffset = interceptX;
