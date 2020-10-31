@@ -120,6 +120,8 @@ int main(int argc, char *args[])
                                      static_cast<float>(tickFrequency);
                 tickCounter = nextCounter;
                 game.Move(moveDirection, rotateDirection, seconds);
+                // printf("coordinate %f %f %f\n", game.playerX, game.playerY,
+                // game.playerA);
             }
             SDL_DestroyTexture(floatTexture);
             SDL_DestroyTexture(fixedTexture);
