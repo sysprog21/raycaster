@@ -148,13 +148,15 @@ void RayCasterFloat::Trace(uint16_t screenX,
     *textureY = 0;
     *textureStep = 0;
     if (distance > 0) {
-        *screenY = INV_FACTOR / distance;
-        auto txs = (*screenY * 2.0f);
+        float tmp = INV_FACTOR / distance;
+        *screenY = tmp;
+        auto txs = (tmp * 2.0f);
         if (txs != 0) {
             *textureStep = (256 / txs) * 256;
             if (txs > SCREEN_HEIGHT) {
                 auto wallHeight = (txs - SCREEN_HEIGHT) / 2;
                 *textureY = wallHeight * (256 / txs) * 256;
+                *screenY = HORIZON_HEIGHT;
             }
         }
     } else {
