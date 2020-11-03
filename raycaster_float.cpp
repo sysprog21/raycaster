@@ -19,6 +19,13 @@ bool RayCasterFloat::IsWall(float rayX, float rayY)
            (1 << (8 - (tileX & 0x7)));
 }
 
+float p2pDist(float x1, float y1, float x2, float y2)
+{
+    float delta_x = x1 - x2;
+    float delta_y = y1 - y2;
+    return sqrt(delta_x * delta_x + delta_y * delta_y);
+}
+
 float RayCasterFloat::Distance(float playerX,
                                float playerY,
                                float rayA,
@@ -32,84 +39,90 @@ float RayCasterFloat::Distance(float playerX,
         rayA -= 2.0f * M_PI;
     }
 
-    int tileStepX = 1;
-    int tileStepY = 1;
-    float tileX = 0;
-    float tileY = 0;
-    if (rayA > M_PI) {
-        tileStepX = -1;
-    }
-    if (rayA > M_PI_2 && rayA < 3 * M_PI_2) {
-        tileStepY = -1;
-    }
+    float tanA = tan(rayA);
+    float cotA = 1 / tanA;
+    float rayX, rayY, vx, vy;
+    float xOffset, yOffset, vertHitDis, horiHitDis;
+    int depth = 0;
+    const int maxDepth = 100;
 
-    float rayX = playerX;
-    float rayY = playerY;
-    float offsetX = modff(rayX, &tileX);
-    float offsetY = modff(rayY, &tileY);
-
-    float startDeltaX, startDeltaY;
-    if (rayA <= M_PI_2) {
-        startDeltaX = (1 - offsetY) * tan(rayA);
-        startDeltaY = (1 - offsetX) / tan(rayA);
-    } else if (rayA <= M_PI) {
-        startDeltaX = (offsetY) *fabs(tan(rayA));
-        startDeltaY = -(1 - offsetX) / fabs(tan(rayA));
-    } else if (rayA < 3 * M_PI_2) {
-        startDeltaX = -(offsetY) *fabs(tan(rayA));
-        startDeltaY = -(offsetX) / fabs(tan(rayA));
-    } else {
-        startDeltaX = -(1 - offsetY) * fabs(tan(rayA));
-        startDeltaY = (offsetX) / fabs(tan(rayA));
+    // Check for vertical hit
+    depth = 0;
+    vertHitDis = 0;
+    if (sin(rayA) > 0.001) {  // rayA pointing rightward
+        rayX = static_cast<int>(playerX) + 1;
+        rayY = (rayX - playerX) * cotA + playerY;
+        xOffset = 1;
+        yOffset = xOffset * cotA;
+    } else if (sin(rayA) < -0.001) {  // rayA pointing leftward
+        rayX = static_cast<int>(playerX) - 0.001;
+        rayY = (rayX - playerX) * cotA + playerY;
+        xOffset = -1;
+        yOffset = xOffset * cotA;
+    } else {  // rayA pointing up or down
+        rayX = playerX;
+        rayY = playerY;
+        xOffset = 0;
+        yOffset = 0;
+        depth = maxDepth;
     }
 
-    float interceptX = rayX + startDeltaX;
-    float interceptY = rayY + startDeltaY;
-    float stepX = fabs(tan(rayA)) * tileStepX;
-    float stepY = fabs(1 / tan(rayA)) * tileStepY;
-    bool verticalHit = false;
-    bool horizontalHit = false;
-    bool somethingDone = false;
-
-    do {
-        somethingDone = false;
-        while (((tileStepY == 1 && (interceptY <= tileY + 1)) ||
-                (tileStepY == -1 && (interceptY >= tileY)))) {
-            somethingDone = true;
-            tileX += tileStepX;
-            if (IsWall(tileX, interceptY)) {
-                verticalHit = true;
-                rayX = tileX + (tileStepX == -1 ? 1 : 0);
-                rayY = interceptY;
-                *hitOffset = interceptY;
-                *hitDirection = true;
-                break;
-            }
-            interceptY += stepY;
+    while (depth < maxDepth) {
+        if (IsWall(rayX, rayY)) {
+            vertHitDis = p2pDist(playerX, playerY, rayX, rayY);
+            break;
+        } else {
+            rayX += xOffset;
+            rayY += yOffset;
+            depth += 1;
         }
-        while (!verticalHit && ((tileStepX == 1 && (interceptX <= tileX + 1)) ||
-                                (tileStepX == -1 && (interceptX >= tileX)))) {
-            somethingDone = true;
-            tileY += tileStepY;
-            if (IsWall(interceptX, tileY)) {
-                horizontalHit = true;
-                rayX = interceptX;
-                *hitOffset = interceptX;
-                *hitDirection = 0;
-                rayY = tileY + (tileStepY == -1 ? 1 : 0);
-                break;
-            }
-            interceptX += stepX;
-        }
-    } while ((!horizontalHit && !verticalHit) && somethingDone);
+    }
+    vx = rayX;
+    vy = rayY;
 
-    if (!somethingDone) {
-        return 0;
+    // Check for horizontal hit
+    depth = 0;
+    horiHitDis = 0;
+    if (cos(rayA) > 0.001) {  // rayA pointing upward
+        rayY = static_cast<int>(playerY) + 1;
+        rayX = (rayY - playerY) * tanA + playerX;
+        yOffset = 1;
+        xOffset = yOffset * tanA;
+    } else if (cos(rayA) < -0.001) {  // rayA pointing downward
+        rayY = static_cast<int>(playerY) - 0.001;
+        rayX = (rayY - playerY) * tanA + playerX;
+        yOffset = -1;
+        xOffset = yOffset * tanA;
+    } else {  // rayA pointing leftward or rightward
+        rayX = playerX;
+        rayY = playerY;
+        xOffset = 0;
+        yOffset = 0;
+        depth = maxDepth;
     }
 
-    float deltaX = rayX - playerX;
-    float deltaY = rayY - playerY;
-    return sqrt(deltaX * deltaX + deltaY * deltaY);
+    while (depth < maxDepth) {
+        if (IsWall(rayX, rayY)) {
+            horiHitDis = p2pDist(playerX, playerY, rayX, rayY);
+            break;
+        } else {
+            rayX += xOffset;
+            rayY += yOffset;
+            depth += 1;
+        }
+    }
+
+    if (vertHitDis < horiHitDis) {  // Vertical hit
+        rayX = vx;
+        rayY = vy;
+        *hitDirection = true;
+        *hitOffset = rayY;
+    } else {  // Horizontal hit
+        *hitDirection = false;
+        *hitOffset = rayX;
+    }
+
+    return vertHitDis < horiHitDis ? vertHitDis : horiHitDis;
 }
 
 void RayCasterFloat::Trace(uint16_t screenX,
