@@ -2,6 +2,7 @@
 
 #include "raycaster_float.h"
 #include <math.h>
+#include <algorithm>
 
 bool RayCasterFloat::IsWall(float rayX, float rayY)
 {
@@ -122,7 +123,7 @@ float RayCasterFloat::Distance(float playerX,
         *hitOffset = rayX;
     }
 
-    return vertHitDis < horiHitDis ? vertHitDis : horiHitDis;
+    return std::min(vertHitDis, horiHitDis);
 }
 
 void RayCasterFloat::Trace(uint16_t screenX,
