@@ -4,6 +4,10 @@
 #include <math.h>
 #include <algorithm>
 
+#define P2P_DISTANCE(x1, y1, x2, y2)              \
+    sqrt((float) (((x1) - (x2)) * ((x1) - (x2)) + \
+                  ((y1) - (y2)) * ((y1) - (y2))))
+
 bool RayCasterFloat::IsWall(float rayX, float rayY)
 {
     float mapX = 0;
@@ -18,13 +22,6 @@ bool RayCasterFloat::IsWall(float rayX, float rayY)
     }
     return g_map[(tileX >> 3) + (tileY << (MAP_XS - 3))] &
            (1 << (8 - (tileX & 0x7)));
-}
-
-float p2pDist(float x1, float y1, float x2, float y2)
-{
-    float delta_x = x1 - x2;
-    float delta_y = y1 - y2;
-    return sqrt(delta_x * delta_x + delta_y * delta_y);
 }
 
 float RayCasterFloat::Distance(float playerX,
@@ -70,7 +67,7 @@ float RayCasterFloat::Distance(float playerX,
 
     while (depth < maxDepth) {
         if (IsWall(rayX, rayY)) {
-            vertHitDis = p2pDist(playerX, playerY, rayX, rayY);
+            vertHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
             break;
         } else {
             rayX += xOffset;
@@ -104,7 +101,7 @@ float RayCasterFloat::Distance(float playerX,
 
     while (depth < maxDepth) {
         if (IsWall(rayX, rayY)) {
-            horiHitDis = p2pDist(playerX, playerY, rayX, rayY);
+            horiHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
             break;
         } else {
             rayX += xOffset;
