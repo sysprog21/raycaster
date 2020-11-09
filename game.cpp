@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "raycaster.h"
+#include "raycaster_data.h"
 
 void Game::Move(int m, int r, float seconds)
 {
@@ -36,4 +37,15 @@ Game::Game()
     playerA = 5.25f;
 }
 
-Game::~Game() {}
+bool Game::IsWall(uint8_t tileX, uint8_t tileY)
+{
+    if (tileX > MAP_X - 1 || tileY > MAP_Y - 1) {
+        return true;
+    }
+    return LOOKUP8(g_map, (tileX >> 3) + (tileY << (MAP_XS - 3))) &
+           (1 << (8 - (tileX & 0x7)));
+}
+
+Game::~Game()
+{
+}

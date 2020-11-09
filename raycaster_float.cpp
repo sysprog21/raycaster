@@ -3,22 +3,6 @@
 #include "raycaster_float.h"
 #include <math.h>
 
-bool RayCasterFloat::IsWall(float rayX, float rayY)
-{
-    float mapX = 0;
-    float mapY = 0;
-    float offsetX = modff(rayX, &mapX);
-    float offsetY = modff(rayY, &mapY);
-    int tileX = static_cast<int>(mapX);
-    int tileY = static_cast<int>(mapY);
-
-    if (tileX < 0 || tileY < 0 || tileX >= MAP_X - 1 || tileY >= MAP_Y - 1) {
-        return true;
-    }
-    return g_map[(tileX >> 3) + (tileY << (MAP_XS - 3))] &
-           (1 << (8 - (tileX & 0x7)));
-}
-
 float RayCasterFloat::Distance(float playerX,
                                float playerY,
                                float rayA,
@@ -93,7 +77,7 @@ float RayCasterFloat::Distance(float playerX,
                 (tileStepY == -1 && (interceptY >= tileY)))) {
             somethingDone = true;
             tileX += tileStepX;
-            if (IsWall(tileX, interceptY)) {
+            if (game->IsWall(tileX, interceptY)) {
                 verticalHit = true;
                 rayX = tileX + (tileStepX == -1 ? 1 : 0);
                 rayY = interceptY;
@@ -107,7 +91,7 @@ float RayCasterFloat::Distance(float playerX,
                                 (tileStepX == -1 && (interceptX >= tileX)))) {
             somethingDone = true;
             tileY += tileStepY;
-            if (IsWall(interceptX, tileY)) {
+            if (game->IsWall(interceptX, tileY)) {
                 horizontalHit = true;
                 rayX = interceptX;
                 *hitOffset = interceptX;
@@ -169,6 +153,10 @@ void RayCasterFloat::Start(uint16_t playerX, uint16_t playerY, int16_t playerA)
     _playerA = (playerA / 1024.0f) * 2.0f * M_PI;
 }
 
-RayCasterFloat::RayCasterFloat() : RayCaster() {}
+RayCasterFloat::RayCasterFloat(Game *game) : RayCaster(game)
+{
+}
 
-RayCasterFloat::~RayCasterFloat() {}
+RayCasterFloat::~RayCasterFloat()
+{
+}
