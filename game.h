@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+// treat player as a circle for collision test
+// should be smaller than 0.5
+#define PLAYER_RADIUS 0.2f
+
 class Game
 {
 public:
@@ -12,4 +16,7 @@ public:
 
     Game();
     ~Game();
+
+private:
+    void CollideWithMap();
 };
