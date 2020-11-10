@@ -18,5 +18,5 @@ public:
     ~Game();
 
 private:
-    void CollideWithMap();
+    void CheckWallCollisions();
 };

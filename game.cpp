@@ -1,11 +1,12 @@
 #include <cmath>
 #include <cstdlib>
+#include <cassert>
 
 #include "game.h"
 #include "raycaster.h"
 #include "raycaster_data.h"
 
-inline float distance(float x1, float y1, float x2, float y2)
+static inline float distance(float x1, float y1, float x2, float y2)
 {
     x1 -= x2;
     y1 -= y2;
@@ -25,7 +26,7 @@ void Game::Move(int m, int r, float seconds)
         playerA -= 2.0f * M_PI;
     }
 
-    CollideWithMap();
+    CheckWallCollisions();
 }
 
 Game::Game()
@@ -44,37 +45,38 @@ bool Game::IsWall(uint8_t tileX, uint8_t tileY)
            (1 << (8 - (tileX & 0x7)));
 }
 
-void Game::CollideWithMap()
+void Game::CheckWallCollisions()
 {
     float offsetX, offsetY, mapX, mapY;
-    bool collideX, collideY;
+    bool collided;
     offsetX = modff(playerX, &mapX);
     offsetY = modff(playerY, &mapY);
 
-    // collide with four neighboring wall planes
-    // assuming PLAYER_RADIUS < 0.5.
-    // that is, player is smaller than a block of wall
-    collideX = collideY = false;
-    if (1 - offsetX < PLAYER_RADIUS && IsWall(mapX + 1, mapY)) {
+    static_assert(PLAYER_RADIUS < 0.5f,
+                  "Player size should be smaller than a block (1x1).");
+
+    // check collisions with four neighboring wall planes
+    collided = false;
+    if ((1 - offsetX) < PLAYER_RADIUS && IsWall(mapX + 1, mapY)) {
         playerX = mapX + 1 - PLAYER_RADIUS;
-        collideX = true;
+        collided = true;
     } else if (offsetX < PLAYER_RADIUS && IsWall(mapX - 1, mapY)) {
         playerX = mapX + PLAYER_RADIUS;
-        collideX = true;
+        collided = true;
     }
-    if (1 - offsetY < PLAYER_RADIUS && IsWall(mapX, mapY + 1)) {
+    if ((1 - offsetY) < PLAYER_RADIUS && IsWall(mapX, mapY + 1)) {
         playerY = mapY + 1 - PLAYER_RADIUS;
-        collideY = true;
+        collided = true;
     } else if (offsetY < PLAYER_RADIUS && IsWall(mapX, mapY - 1)) {
         playerY = mapY + PLAYER_RADIUS;
-        collideY = true;
+        collided = true;
     }
 
-    if (collideX || collideY)
+    if (collided)
         return;
 
-    // collide with four corners
-    // we only have to do this if no walls have been touched
+    // check collisions with four corners
+    // we only have to do this if the player haven't collided with any planes
     for (int i = -1; i <= 1; i += 2) {
         for (int j = -1; j <= 1; j += 2) {
             float cornerDistance =
