@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "game.h"
 
 /* specify the precalcuated tables */
 #define TABLES_320
@@ -35,7 +36,10 @@ public:
                        uint16_t *textureY,
                        uint16_t *textureStep) = 0;
 
-    RayCaster(){};
+    RayCaster(Game *g) : game(g){};
 
     ~RayCaster(){};
+
+protected:
+    Game *game;
 };

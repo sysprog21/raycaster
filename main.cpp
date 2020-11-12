@@ -79,10 +79,10 @@ int main(int argc, char *args[])
                    SDL_GetError());
         } else {
             Game game;
-            RayCasterFloat floatCaster;
+            RayCasterFloat floatCaster(&game);
             Renderer floatRenderer(&floatCaster);
             uint32_t floatBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
-            RayCasterFixed fixedCaster;
+            RayCasterFixed fixedCaster(&game);
             Renderer fixedRenderer(&fixedCaster);
             uint32_t fixedBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
             int moveDirection = 0;

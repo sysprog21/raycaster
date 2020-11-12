@@ -1,6 +1,7 @@
 #pragma once
 #include "raycaster.h"
 #include "raycaster_data.h"
+#include "game.h"
 
 class RayCasterFloat : public RayCaster
 {
@@ -13,7 +14,7 @@ public:
                uint16_t *textureY,
                uint16_t *textureStep);
 
-    RayCasterFloat();
+    RayCasterFloat(Game *game);
     ~RayCasterFloat();
 
 private:
@@ -26,5 +27,4 @@ private:
                    float rayA,
                    float *hitOffset,
                    int *hitDirection);
-    bool IsWall(float rayX, float rayY);
 };
