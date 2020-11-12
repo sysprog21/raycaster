@@ -58,15 +58,6 @@ inline int16_t RayCasterFixed::AbsTan(uint8_t quarter,
     return LOOKUP16(lookupTable, angle);
 }
 
-inline bool RayCasterFixed::IsWall(uint8_t tileX, uint8_t tileY)
-{
-    if (tileX > MAP_X - 1 || tileY > MAP_Y - 1) {
-        return true;
-    }
-    return LOOKUP8(g_map, (tileX >> 3) + (tileY << (MAP_XS - 3))) &
-           (1 << (8 - (tileX & 0x7)));
-}
-
 void RayCasterFixed::LookupHeight(uint16_t distance,
                                   uint8_t *height,
                                   uint16_t *step)
@@ -118,7 +109,7 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
             }
             for (;;) {
                 tileY += tileStepY;
-                if (IsWall(tileX, tileY)) {
+                if (map->IsWall(tileX, tileY)) {
                     goto HorizontalHit;
                 }
             }
@@ -131,7 +122,7 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
             }
             for (;;) {
                 tileX += tileStepX;
-                if (IsWall(tileX, tileY)) {
+                if (map->IsWall(tileX, tileY)) {
                     goto VerticalHit;
                 }
             }
@@ -177,7 +168,7 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
             while ((tileStepY == 1 && (interceptY >> 8 < tileY)) ||
                    (tileStepY == -1 && (interceptY >> 8 >= tileY))) {
                 tileX += tileStepX;
-                if (IsWall(tileX, tileY)) {
+                if (map->IsWall(tileX, tileY)) {
                     goto VerticalHit;
                 }
                 interceptY += stepY;
@@ -185,7 +176,7 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
             while ((tileStepX == 1 && (interceptX >> 8 < tileX)) ||
                    (tileStepX == -1 && (interceptX >> 8 >= tileX))) {
                 tileY += tileStepY;
-                if (IsWall(tileX, tileY)) {
+                if (map->IsWall(tileX, tileY)) {
                     goto HorizontalHit;
                 }
                 interceptX += stepX;
@@ -293,15 +284,23 @@ void RayCasterFixed::Trace(uint16_t screenX,
     }
 }
 
-void RayCasterFixed::Start(uint16_t playerX, uint16_t playerY, int16_t playerA)
+void RayCasterFixed::Start(uint16_t playerX,
+                           uint16_t playerY,
+                           int16_t playerA,
+                           Map *m)
 {
     _viewQuarter = playerA >> 8;
     _viewAngle = playerA % 256;
     _playerX = playerX;
     _playerY = playerY;
     _playerA = playerA;
+    map = m;
 }
 
-RayCasterFixed::RayCasterFixed() : RayCaster() {}
+RayCasterFixed::RayCasterFixed() : RayCaster()
+{
+}
 
-RayCasterFixed::~RayCasterFixed() {}
+RayCasterFixed::~RayCasterFixed()
+{
+}

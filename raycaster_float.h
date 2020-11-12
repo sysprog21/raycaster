@@ -5,7 +5,7 @@
 class RayCasterFloat : public RayCaster
 {
 public:
-    void Start(uint16_t playerX, uint16_t playerY, int16_t playerA);
+    void Start(uint16_t playerX, uint16_t playerY, int16_t playerA, Map *map);
     void Trace(uint16_t screenX,
                uint8_t *screenY,
                uint8_t *textureNo,
@@ -26,5 +26,4 @@ private:
                    float rayA,
                    float *hitOffset,
                    int *hitDirection);
-    bool IsWall(float rayX, float rayY);
 };
