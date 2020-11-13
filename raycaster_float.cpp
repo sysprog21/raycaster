@@ -1,4 +1,20 @@
 // floating-point implementation for testing/comparison
+//
+// This diagram shows the coordinate system used in the
+// RayCasterFloat::Distance() function.
+//
+//              ^ rayA/
+//     sin-     |    /   sin+
+//     cos+     |   /    cos+
+//     tan-     |  /     tan+
+//              | /
+//              |/
+// ---------------------------->
+//              |
+//     sin-     |        sin+
+//     cos-     |        cos-
+//     tan+     |        tan-
+//              |
 
 #include "raycaster_float.h"
 #include <math.h>
