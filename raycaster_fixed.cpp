@@ -297,10 +297,6 @@ void RayCasterFixed::Start(uint16_t playerX,
     map = m;
 }
 
-RayCasterFixed::RayCasterFixed() : RayCaster()
-{
-}
+RayCasterFixed::RayCasterFixed() : RayCaster() {}
 
-RayCasterFixed::~RayCasterFixed()
-{
-}
+RayCasterFixed::~RayCasterFixed() {}

@@ -37,6 +37,4 @@ Game::Game(Map *m)
     map = m;
 }
 
-Game::~Game()
-{
-}
+Game::~Game() {}

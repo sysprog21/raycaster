@@ -157,10 +157,6 @@ void RayCasterFloat::Start(uint16_t playerX,
     map = m;
 }
 
-RayCasterFloat::RayCasterFloat() : RayCaster()
-{
-}
+RayCasterFloat::RayCasterFloat() : RayCaster() {}
 
-RayCasterFloat::~RayCasterFloat()
-{
-}
+RayCasterFloat::~RayCasterFloat() {}
