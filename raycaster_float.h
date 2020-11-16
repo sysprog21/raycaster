@@ -1,6 +1,5 @@
 #pragma once
 #include "raycaster.h"
-#include "raycaster_data.h"
 
 class RayCasterFloat : public RayCaster
 {
