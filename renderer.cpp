@@ -7,7 +7,7 @@ void Renderer::TraceFrame(Game *g, uint32_t *fb)
     _rc->Start(static_cast<uint16_t>(g->playerX * 256.0f),
                static_cast<uint16_t>(g->playerY * 256.0f),
                static_cast<int16_t>(g->playerA / (2.0f * M_PI) * 1024.0f),
-               g->map);
+               &g->map);
 
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         uint8_t sso;

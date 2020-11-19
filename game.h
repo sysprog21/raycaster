@@ -9,8 +9,8 @@ public:
     void Move(int m, int r, float seconds);
 
     float playerX, playerY, playerA;
-    Map *map;
+    Map map;
 
-    Game(Map *map);
+    Game(const uint8_t *map);
     ~Game();
 };

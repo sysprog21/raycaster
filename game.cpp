@@ -29,12 +29,11 @@ void Game::Move(int m, int r, float seconds)
     }
 }
 
-Game::Game(Map *m)
+Game::Game(const uint8_t *m) : map(m)
 {
     playerX = 23.03f;
     playerY = 6.8f;
     playerA = 5.25f;
-    map = m;
 }
 
 Game::~Game() {}

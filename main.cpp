@@ -7,6 +7,7 @@
 #include "raycaster.h"
 #include "raycaster_fixed.h"
 #include "raycaster_float.h"
+#include "raycaster_data.h"
 #include "renderer.h"
 #include "map.h"
 
@@ -79,8 +80,7 @@ int main(int argc, char *args[])
             printf("Window could not be created! SDL_Error: %s\n",
                    SDL_GetError());
         } else {
-            Map default_map(g_map);
-            Game game(&default_map);
+            Game game(g_map);
             RayCasterFloat floatCaster;
             Renderer floatRenderer(&floatCaster);
             uint32_t floatBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
