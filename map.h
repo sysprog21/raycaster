@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#define MAP_X (uint8_t) 32
-#define MAP_XS (uint8_t) 5
-#define MAP_Y (uint8_t) 32
+#define MAP_X 32
+#define MAP_XS 5
+#define MAP_Y 32
 
 class Map
 {
