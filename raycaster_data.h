@@ -1,5 +1,9 @@
 #pragma once
 
+#define LOOKUP_TBL
+#define LOOKUP8(tbl, offset) tbl[offset]
+#define LOOKUP16(tbl, offset) tbl[offset]
+
 const uint8_t LOOKUP_TBL g_map[] = {
     0b00000000, 0b10000000, 0b00000000, 0b00000000, 0b01111010, 0b10111111,
     0b11111111, 0b00000000, 0b00111000, 0b10100000, 0b00001000, 0b01001100,

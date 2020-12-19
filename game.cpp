@@ -1,8 +1,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#include "map.h"
 #include "game.h"
-#include "raycaster.h"
 
 void Game::Move(int m, int r, float seconds)
 {
@@ -29,7 +29,7 @@ void Game::Move(int m, int r, float seconds)
     }
 }
 
-Game::Game()
+Game::Game(const uint8_t *m) : map(m)
 {
     playerX = 23.03f;
     playerY = 6.8f;

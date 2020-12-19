@@ -29,7 +29,9 @@ OBJS := \
 	raycaster_fixed.o \
 	raycaster_float.o \
 	renderer.o \
+	map.o \
 	main.o
+
 deps := $(OBJS:%.o=.%.o.d)
 
 %.o: %.cpp
