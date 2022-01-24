@@ -2,7 +2,6 @@
 
 #include "raycaster_float.h"
 #include <math.h>
-#include <stdio.h>
 bool RayCasterFloat::IsWall(float rayX, float rayY)
 {
     float mapX = 0;
