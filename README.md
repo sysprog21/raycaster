@@ -1,11 +1,11 @@
 # raycaster
-A efficient and lean implementation of the [ray casting](https://en.wikipedia.org/wiki/Ray_casting) algorithm.
+An efficient and lean implementation of the [ray casting](https://en.wikipedia.org/wiki/Ray_casting) algorithm.
 
 ## Features
 - Both floating-point and fixed-point (8-bit precision) are available.
-- no division operations
+- No division operations
 - 8 x 8-bit multiplications per vertical line
-- precalculated trigonometric and perspective tables
+- Precalculated trigonometric and perspective tables
 
 ## Prerequisites
 This work is built with [SDL2](https://www.libsdl.org/).
