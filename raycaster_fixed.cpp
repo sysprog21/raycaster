@@ -93,8 +93,8 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
                                        uint8_t *textureNo,
                                        uint8_t *textureX)
 {
-    int8_t tileStepX;
-    int8_t tileStepY;
+    int8_t tileStepX = 0;
+    int8_t tileStepY = 0;
     int16_t interceptX = rayX;
     int16_t interceptY = rayY;
 
@@ -138,8 +138,8 @@ void RayCasterFixed::CalculateDistance(uint16_t rayX,
             break;
         }
     } else {
-        int16_t stepX;
-        int16_t stepY;
+        int16_t stepX = 0;
+        int16_t stepY = 0;
 
         switch (quarter) {
         case 0:
