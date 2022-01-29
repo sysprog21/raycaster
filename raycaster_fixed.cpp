@@ -76,9 +76,10 @@ void RayCasterFixed::LookupHeight(uint16_t distance,
         if (ds >= 256) {
             *height = LOOKUP8(g_farHeight, 255) - 1;
             *step = LOOKUP16(g_farStep, 255);
+        } else {
+            *height = LOOKUP8(g_farHeight, ds);
+            *step = LOOKUP16(g_farStep, ds);
         }
-        *height = LOOKUP8(g_farHeight, ds);
-        *step = LOOKUP16(g_farStep, ds);
     } else {
         *height = LOOKUP8(g_nearHeight, distance);
         *step = LOOKUP16(g_nearStep, distance);
