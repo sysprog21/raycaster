@@ -143,7 +143,7 @@ void RayCasterFloat::Trace(uint16_t screenX,
                                   &hitOffset, &hitDirection);
     float distance = lineDistance * cos(deltaAngle);
     float dum;
-    *textureX = (uint8_t)(256.0f * modff(hitOffset, &dum));
+    *textureX = (uint8_t) (256.0f * modff(hitOffset, &dum));
     *textureNo = hitDirection;
     *textureY = 0;
     *textureStep = 0;

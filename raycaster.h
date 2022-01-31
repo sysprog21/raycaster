@@ -17,7 +17,7 @@
 #define MAP_X (uint8_t) 32
 #define MAP_XS (uint8_t) 5
 #define MAP_Y (uint8_t) 32
-#define INV_FACTOR_INT ((uint16_t)(SCREEN_WIDTH * 75))
+#define INV_FACTOR_INT ((uint16_t) (SCREEN_WIDTH * 75))
 #define MIN_DIST (int) ((150 * ((float) SCREEN_WIDTH / (float) SCREEN_HEIGHT)))
 #define HORIZON_HEIGHT (SCREEN_HEIGHT / 2)
 #define INVERT(x) (uint8_t)((x ^ 255) + 1)
