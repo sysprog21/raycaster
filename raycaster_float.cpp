@@ -53,30 +53,14 @@ float RayCasterFloat::Distance(float playerX,
         startDeltaX = (1 - offsetY) * tan(rayA);
         startDeltaY = (1 - offsetX) / tan(rayA);
     } else if (rayA <= M_PI) {
-        if (offsetY == 0) {
-            startDeltaX = (1) * fabs(tan(rayA));
-        } else {
-            startDeltaX = (offsetY) *fabs(tan(rayA));
-        }
+        startDeltaX = (offsetY) *fabs(tan(rayA));
         startDeltaY = -(1 - offsetX) / fabs(tan(rayA));
     } else if (rayA < 3 * M_PI_2) {
-        if (offsetY == 0) {
-            startDeltaX = -(1) * fabs(tan(rayA));
-        } else {
-            startDeltaX = -(offsetY) *fabs(tan(rayA));
-        }
-        if (offsetX == 0) {
-            startDeltaY = -(1) / fabs(tan(rayA));
-        } else {
-            startDeltaY = -(offsetX) / fabs(tan(rayA));
-        }
+        startDeltaX = -(offsetY) *fabs(tan(rayA));
+        startDeltaY = -(offsetX) / fabs(tan(rayA));
     } else {
         startDeltaX = -(1 - offsetY) * fabs(tan(rayA));
-        if (offsetX == 0) {
-            startDeltaY = (1) / fabs(tan(rayA));
-        } else {
-            startDeltaY = (offsetX) / fabs(tan(rayA));
-        }
+        startDeltaY = (offsetX) / fabs(tan(rayA));
     }
 
     float interceptX = rayX + startDeltaX;
