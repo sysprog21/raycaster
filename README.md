@@ -1,5 +1,5 @@
 # raycaster
-A efficient and lean implementation of the [ray casting](https://en.wikipedia.org/wiki/Ray_casting) algorithm.
+An efficient and lean implementation of the [ray casting](https://en.wikipedia.org/wiki/Ray_casting) algorithm.
 
 ## Features
 - Both floating-point and fixed-point (8-bit precision) are available.
