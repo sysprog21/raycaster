@@ -58,7 +58,8 @@ float RayCasterFloat::Distance(float playerX,
     float rayX, rayY, vx, vy;
     float xOffset, yOffset, vertHitDis, horiHitDis;
     int depth = 0;
-    const int maxDepth = 100;
+    const int maxDepth = 100;  // maxDepth is the maximum number of
+                               // attempt for a ray to find a wall.
 
     // Check for vertical hit
     depth = 0;
