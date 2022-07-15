@@ -1,9 +1,11 @@
 BIN = main
 
 CXXFLAGS = -std=c++11 -O2 -Wall -g
+CFLAGS = -O2 -Wall -g
+LDFLAGS = -lm -ldl
 
 # SDL
-CXXFLAGS += `sdl2-config --cflags`
+CFLAGS += `sdl2-config --cflags`
 LDFLAGS += `sdl2-config --libs`
 
 # Control the build verbosity
@@ -26,30 +28,33 @@ $(GIT_HOOKS):
 	
 OBJS := \
 	game.o \
+	raycaster.o \
 	raycaster_fixed.o \
 	raycaster_float.o \
+	raycaster_data.o \
 	renderer.o \
 	main.o
 deps := $(OBJS:%.o=.%.o.d)
 
-tools/%.o: tools/%.cpp
+precalculator.o: tools/precalculator.cpp
 	$(VECHO) "  CXX\t$@\n"
 	$(Q)$(CXX) -o $@ $(CXXFLAGS) -c -I . $<
 
-precalculator: tools/precalculator.o
+precalculator: precalculator.o
 	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
 
 raycaster_tables.h: precalculator
 	./precalculator > $@
 
-%.o: %.cpp raycaster_tables.h
+%.o: %.c raycaster_tables.h
 	$(VECHO) "  CXX\t$@\n"
-	$(Q)$(CXX) -o $@ $(CXXFLAGS) -c -MMD -MF .$@.d $<
+	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
 $(BIN): $(OBJS)
-	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
+	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
+	$(RM) raycaster_tables.h
 	$(RM) $(BIN) $(OBJS) $(deps)
 
 -include $(deps)

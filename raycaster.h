@@ -22,20 +22,28 @@
 #define HORIZON_HEIGHT (SCREEN_HEIGHT / 2)
 #define INVERT(x) (uint8_t)((x ^ 255) + 1)
 #define ABS(x) (x < 0 ? -x : x)
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-class RayCaster
-{
-public:
-    virtual void Start(uint16_t playerX, uint16_t playerY, int16_t playerA) = 0;
+#define RayCaster struct RayCaster_
 
-    virtual void Trace(uint16_t screenX,
-                       uint8_t *screenY,
-                       uint8_t *textureNo,
-                       uint8_t *textureX,
-                       uint16_t *textureY,
-                       uint16_t *textureStep) = 0;
+struct RayCaster_ {
+    void *derived;
 
-    RayCaster(){};
+    void (*Destruct)(RayCaster *rayCaster);
 
-    ~RayCaster(){};
+    void (*Start)(RayCaster *rayCaster,
+                  uint16_t playerX,
+                  uint16_t playerY,
+                  int16_t playerA);
+    void (*Trace)(RayCaster *rayCaster,
+                  uint16_t screenX,
+                  uint8_t *screenY,
+                  uint8_t *textureNo,
+                  uint8_t *textureX,
+                  uint16_t *textureY,
+                  uint16_t *textureStep);
 };
+
+RayCaster *RayCasterConstruct(void);
+
+void RayCasterDestruct(RayCaster *rayCaster);

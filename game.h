@@ -2,13 +2,10 @@
 
 #include <stdint.h>
 
-class Game
-{
-public:
-    void Move(int m, int r, float seconds);
-
+typedef struct Game {
     float playerX, playerY, playerA;
+} Game;
 
-    Game();
-    ~Game();
-};
+Game GameConstruct(void);
+
+void GameMove(Game *game, int m, int r, float seconds);

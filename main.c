@@ -1,15 +1,13 @@
 #include <SDL.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <fstream>
-#include <iostream>
+#include <stdlib.h>
 
 #include "game.h"
 #include "raycaster.h"
 #include "raycaster_fixed.h"
 #include "raycaster_float.h"
 #include "renderer.h"
-
-using namespace std;
 
 static void DrawBuffer(SDL_Renderer *sdlRenderer,
                        SDL_Texture *sdlTexture,
@@ -19,7 +17,8 @@ static void DrawBuffer(SDL_Renderer *sdlRenderer,
     int pitch = 0;
     void *pixelsPtr;
     if (SDL_LockTexture(sdlTexture, NULL, &pixelsPtr, &pitch)) {
-        throw runtime_error("Unable to lock texture");
+        fprintf(stderr, "Unable to lock texture");
+        exit(1);
     }
     memcpy(pixelsPtr, fb, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
     SDL_UnlockTexture(sdlTexture);
@@ -31,7 +30,7 @@ static void DrawBuffer(SDL_Renderer *sdlRenderer,
     SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, &r);
 }
 
-static bool ProcessEvent(const SDL_Event &event,
+static bool ProcessEvent(SDL_Event event,
                          int *moveDirection,
                          int *rotateDirection)
 {
@@ -39,8 +38,8 @@ static bool ProcessEvent(const SDL_Event &event,
         return true;
     } else if ((event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) &&
                event.key.repeat == 0) {
-        auto k = event.key;
-        auto p = event.type == SDL_KEYDOWN;
+        SDL_KeyboardEvent k = event.key;
+        bool p = event.type == SDL_KEYDOWN;
         switch (k.keysym.sym) {
         case SDLK_ESCAPE:
             return true;
@@ -78,18 +77,18 @@ int main(int argc, char *args[])
             printf("Window could not be created! SDL_Error: %s\n",
                    SDL_GetError());
         } else {
-            Game game;
-            RayCasterFloat floatCaster;
-            Renderer floatRenderer(&floatCaster);
+            Game game = GameConstruct();
+            RayCaster *floatCaster = RayCasterFloatConstruct();
+            Renderer floatRenderer = RendererConstruct(floatCaster);
             uint32_t floatBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
-            RayCasterFixed fixedCaster;
-            Renderer fixedRenderer(&fixedCaster);
+            RayCaster *fixedCaster = RayCasterFixedConstruct();
+            Renderer fixedRenderer = RendererConstruct(fixedCaster);
             uint32_t fixedBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
             int moveDirection = 0;
             int rotateDirection = 0;
             bool isExiting = false;
-            const static auto tickFrequency = SDL_GetPerformanceFrequency();
-            auto tickCounter = SDL_GetPerformanceCounter();
+            const int tickFrequency = SDL_GetPerformanceFrequency();
+            int tickCounter = SDL_GetPerformanceCounter();
             SDL_Event event;
 
             SDL_Renderer *sdlRenderer =
@@ -102,8 +101,8 @@ int main(int argc, char *args[])
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             while (!isExiting) {
-                floatRenderer.TraceFrame(&game, floatBuffer);
-                fixedRenderer.TraceFrame(&game, fixedBuffer);
+                RendererTraceFrame(&floatRenderer, &game, floatBuffer);
+                RendererTraceFrame(&fixedRenderer, &game, fixedBuffer);
 
                 DrawBuffer(sdlRenderer, fixedTexture, fixedBuffer, 0);
                 DrawBuffer(sdlRenderer, floatTexture, floatBuffer,
@@ -115,16 +114,18 @@ int main(int argc, char *args[])
                     isExiting =
                         ProcessEvent(event, &moveDirection, &rotateDirection);
                 }
-                const auto nextCounter = SDL_GetPerformanceCounter();
-                const auto seconds = (nextCounter - tickCounter) /
-                                     static_cast<float>(tickFrequency);
+                const int nextCounter = SDL_GetPerformanceCounter();
+                const float seconds =
+                    (nextCounter - tickCounter) / ((float) tickFrequency);
                 tickCounter = nextCounter;
-                game.Move(moveDirection, rotateDirection, seconds);
+                GameMove(&game, moveDirection, rotateDirection, seconds);
             }
             SDL_DestroyTexture(floatTexture);
             SDL_DestroyTexture(fixedTexture);
             SDL_DestroyRenderer(sdlRenderer);
             SDL_DestroyWindow(sdlWindow);
+            fixedCaster->Destruct(fixedCaster);
+            floatCaster->Destruct(floatCaster);
         }
     }
 

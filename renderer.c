@@ -1,12 +1,25 @@
 #include "renderer.h"
 #include <math.h>
+#include <stdlib.h>
 #include "raycaster_data.h"
 
-void Renderer::TraceFrame(Game *g, uint32_t *fb)
+inline static uint32_t GetARGB(uint8_t brightness)
 {
-    _rc->Start(static_cast<uint16_t>(g->playerX * 256.0f),
-               static_cast<uint16_t>(g->playerY * 256.0f),
-               static_cast<int16_t>(g->playerA / (2.0f * M_PI) * 1024.0f));
+    return (brightness << 16) + (brightness << 8) + brightness;
+}
+
+Renderer RendererConstruct(RayCaster *rc)
+{
+    Renderer renderer;
+    renderer.rc = rc;
+    return renderer;
+}
+
+void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
+{
+    renderer->rc->Start(renderer->rc, (uint16_t) (g->playerX * 256.0f),
+                        (uint16_t) (g->playerY * 256.0f),
+                        (int16_t) (g->playerA / (2.0f * M_PI) * 1024.0f));
 
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         uint8_t sso;
@@ -16,9 +29,9 @@ void Renderer::TraceFrame(Game *g, uint32_t *fb)
         uint16_t tst;
         uint32_t *lb = fb + x;
 
-        _rc->Trace(x, &sso, &tn, &tc, &tso, &tst);
+        renderer->rc->Trace(renderer->rc, x, &sso, &tn, &tc, &tso, &tst);
 
-        const auto tx = static_cast<int>(tc >> 2);
+        const int tx = (int) (tc >> 2);
         int16_t ws = HORIZON_HEIGHT - sso;
         if (ws < 0) {
             ws = 0;
@@ -34,8 +47,8 @@ void Renderer::TraceFrame(Game *g, uint32_t *fb)
 
         for (int y = 0; y < sso * 2; y++) {
             // paint texture pixel
-            auto ty = static_cast<int>(to >> 10);
-            auto tv = g_texture8[(ty << 6) + tx];
+            int ty = (int) (to >> 10);
+            uint8_t tv = g_texture8[(ty << 6) + tx];
 
             to += ts;
 
