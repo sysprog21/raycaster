@@ -32,12 +32,22 @@ OBJS := \
 	main.o
 deps := $(OBJS:%.o=.%.o.d)
 
-%.o: %.cpp
+tools/%.o: tools/%.cpp
+	$(VECHO) "  CXX\t$@\n"
+	$(Q)$(CXX) -o $@ $(CXXFLAGS) -c -I . $<
+
+precalculator: tools/precalculator.o
+	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
+
+raycaster_tables.h: precalculator
+	./precalculator > $@
+
+%.o: %.cpp raycaster_tables.h
 	$(VECHO) "  CXX\t$@\n"
 	$(Q)$(CXX) -o $@ $(CXXFLAGS) -c -MMD -MF .$@.d $<
 
 $(BIN): $(OBJS)
-	$(Q)$(CXX)  -o $@ $^ $(LDFLAGS)
+	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
 
 clean:
 	$(RM) $(BIN) $(OBJS) $(deps)
