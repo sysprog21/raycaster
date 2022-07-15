@@ -1,3 +1,10 @@
+# Auto-generated tables
+raycaster_tables.c
+
+# Object files
 *.o.d
 *.o
-main
+
+# Binaries
+kernel.elf
+precalculator

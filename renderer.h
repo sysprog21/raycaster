@@ -3,17 +3,12 @@
 #include "game.h"
 #include "raycaster.h"
 
-class Renderer
-{
-    RayCaster *_rc;
+typedef struct {
+    RayCaster *rc;
+} Renderer;
 
-    inline static uint32_t GetARGB(uint8_t brightness)
-    {
-        return (brightness << 16) + (brightness << 8) + brightness;
-    }
+Renderer RendererConstruct(RayCaster *rc);
 
-public:
-    void TraceFrame(Game *g, uint32_t *frameBuffer);
-    Renderer(RayCaster *rc) { _rc = rc; };
-    ~Renderer(){};
-};
+void RendererDestruct(Renderer *renderer);
+
+void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *frameBuffer);
