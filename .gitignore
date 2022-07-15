@@ -1,3 +1,9 @@
 *.o.d
 *.o
-main
+null.d
+raycaster_tables.c
+
+kernel.elf
+precalculator
+
+.vscode
