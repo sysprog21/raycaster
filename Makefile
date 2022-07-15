@@ -47,14 +47,14 @@ raycaster_tables.h: precalculator
 	./precalculator > $@
 
 %.o: %.c raycaster_tables.h
-	$(VECHO) "  CXX\t$@\n"
+	$(VECHO) "  C\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
 $(BIN): $(OBJS)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	$(RM) raycaster_tables.h
+	$(RM) precalculator precalculator.o raycaster_tables.h
 	$(RM) $(BIN) $(OBJS) $(deps)
 
 -include $(deps)
