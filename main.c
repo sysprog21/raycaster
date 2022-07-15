@@ -100,6 +100,9 @@ int main(int argc, char *args[])
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+            float elapsed = 0.0f;
+            int frames = 0;
+
             while (!isExiting) {
                 RendererTraceFrame(&floatRenderer, &game, floatBuffer);
                 RendererTraceFrame(&fixedRenderer, &game, fixedBuffer);
@@ -118,7 +121,19 @@ int main(int argc, char *args[])
                 const float seconds =
                     (nextCounter - tickCounter) / ((float) tickFrequency);
                 tickCounter = nextCounter;
+                elapsed += seconds;
+                if (elapsed >= 1.0f) {
+                    char title[64];
+                    sprintf(
+                        title,
+                        "RayCaster [fixed-point vs. floating-point] FPS: %.2f",
+                        frames / elapsed);
+                    SDL_SetWindowTitle(sdlWindow, title);
+                    elapsed -= 1.0f;
+                    frames = 0;
+                }
                 GameMove(&game, moveDirection, rotateDirection, seconds);
+                ++frames;
             }
             SDL_DestroyTexture(floatTexture);
             SDL_DestroyTexture(fixedTexture);
