@@ -1,7 +1,7 @@
 BIN = main
 
 CXXFLAGS = -std=c++11 -O2 -Wall -g
-CFLAGS = -O2 -Wall -g
+CFLAGS = -std=c11 -O2 -Wall -g -D_GNU_SOURCE
 LDFLAGS = -lm -ldl
 
 # SDL
