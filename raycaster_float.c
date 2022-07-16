@@ -25,11 +25,13 @@
     sqrtf((float) (((x1) - (x2)) * ((x1) - (x2)) + \
                    ((y1) - (y2)) * ((y1) - (y2))))
 
-typedef struct RayCasterFloat {
+#define RayCasterFloat struct RayCasterFloat_
+
+struct RayCasterFloat_ {
     float playerX;
     float playerY;
     float playerA;
-} RayCasterFloat;
+};
 
 static void RayCasterFloatStart(RayCaster *rayCaster,
                                 uint16_t playerX,
