@@ -4,6 +4,7 @@ An efficient and lean implementation of the [ray casting](https://en.wikipedia.o
 ## Features
 - no floating-point operations
 - no division operations
+- no memory allocation
 - 8 x 8-bit multiplications per vertical line
 - precalculated trigonometric and perspective tables
 

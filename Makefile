@@ -29,7 +29,6 @@ $(GIT_HOOKS):
 OBJS := \
 	game.o \
 	raycaster.o \
-	raycaster_fixed.o \
 	raycaster_data.o \
 	renderer.o \
 	raycaster_tables.o \

@@ -5,7 +5,6 @@
 
 #include "game.h"
 #include "raycaster.h"
-#include "raycaster_fixed.h"
 #include "renderer.h"
 
 static void DrawBuffer(SDL_Renderer *sdlRenderer,
@@ -76,8 +75,8 @@ int main(int argc, char *args[])
                    SDL_GetError());
         } else {
             Game game = GameConstruct();
-            RayCaster *fixedCaster = RayCasterFixedConstruct();
-            Renderer fixedRenderer = RendererConstruct(fixedCaster);
+            RayCaster fixedCaster = RayCasterConstruct();
+            Renderer fixedRenderer = RendererConstruct(&fixedCaster);
             uint32_t fixedBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
             int moveDirection = 0;
             int rotateDirection = 0;
@@ -111,7 +110,6 @@ int main(int argc, char *args[])
             SDL_DestroyTexture(fixedTexture);
             SDL_DestroyRenderer(sdlRenderer);
             SDL_DestroyWindow(sdlWindow);
-            fixedCaster->Destruct(fixedCaster);
         }
     }
 
