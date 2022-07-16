@@ -123,14 +123,8 @@ void RayCasterPrecalculator::Precalculate()
 int main()
 {
     RayCasterPrecalculator precalculator;
-    std::cout << "#pragma once\n"
-              << "\n"
-              << "#include \"raycaster.h\"\n"
-              << "\n"
-              << "#ifdef TABLES_320\n"
-              << "#define HAS_TABLES\n"
+    std::cout << "#include \"raycaster.h\"\n"
               << "\n";
     precalculator.Precalculate();
-    std::cout << "#endif\n";
     return 0;
 }

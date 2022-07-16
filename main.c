@@ -6,7 +6,6 @@
 #include "game.h"
 #include "raycaster.h"
 #include "raycaster_fixed.h"
-#include "raycaster_float.h"
 #include "renderer.h"
 
 static void DrawBuffer(SDL_Renderer *sdlRenderer,
@@ -87,8 +86,9 @@ int main(int argc, char *args[])
             int tickCounter = SDL_GetPerformanceCounter();
             SDL_Event event;
 
-            SDL_Renderer *sdlRenderer =
-                SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
+            SDL_Renderer *sdlRenderer = SDL_CreateRenderer(
+                sdlWindow, -1,
+                SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
             SDL_Texture *fixedTexture = SDL_CreateTexture(
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -120,7 +120,8 @@ int main(int argc, char *args[])
                     elapsed -= 1.0f;
                     frames = 0;
                 }
-                GameMove(&game, moveDirection, rotateDirection, seconds);
+                GameMove(&game, moveDirection, rotateDirection,
+                         (uint16_t) (seconds * 256.0f));
                 ++frames;
             }
             SDL_DestroyTexture(fixedTexture);

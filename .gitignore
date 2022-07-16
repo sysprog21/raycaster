@@ -1,6 +1,7 @@
 *.o.d
 *.o
-raycaster_tables.h
+raycaster_tables.c
+
 main
 precalculator
 

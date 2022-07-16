@@ -3,9 +3,10 @@
 #include <stdint.h>
 
 typedef struct Game {
-    float playerX, playerY, playerA;
+    uint16_t playerX, playerY;
+    int16_t playerA;
 } Game;
 
 Game GameConstruct(void);
 
-void GameMove(Game *game, int m, int r, float seconds);
+void GameMove(Game *game, int m, int r, uint16_t seconds);

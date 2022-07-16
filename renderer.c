@@ -17,9 +17,7 @@ Renderer RendererConstruct(RayCaster *rc)
 
 void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
 {
-    renderer->rc->Start(renderer->rc, (uint16_t) (g->playerX * 256.0f),
-                        (uint16_t) (g->playerY * 256.0f),
-                        (int16_t) (g->playerA / (2.0f * M_PI) * 1024.0f));
+    renderer->rc->Start(renderer->rc, g->playerX, g->playerY, g->playerA);
 
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         uint8_t sso;

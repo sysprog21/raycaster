@@ -1,4 +1,4 @@
-BIN = main
+BIN = main precalculator
 
 CXXFLAGS = -std=c++11 -O2 -Wall -g
 CFLAGS = -std=c11 -O2 -Wall -g -D_GNU_SOURCE
@@ -30,9 +30,9 @@ OBJS := \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \
-	raycaster_float.o \
 	raycaster_data.o \
 	renderer.o \
+	raycaster_tables.o \
 	main.o
 deps := $(OBJS:%.o=.%.o.d)
 
@@ -43,18 +43,17 @@ precalculator.o: tools/precalculator.cpp
 precalculator: precalculator.o
 	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
 
-raycaster_tables.h: precalculator
+raycaster_tables.c: precalculator
 	./precalculator > $@
 
-%.o: %.c raycaster_tables.h
+%.o: %.c
 	$(VECHO) "  C\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
-$(BIN): $(OBJS)
+main: $(OBJS)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	$(RM) precalculator precalculator.o raycaster_tables.h
-	$(RM) $(BIN) $(OBJS) $(deps)
+	$(RM) $(BIN) $(OBJS) $(deps) raycaster_tables.c
 
 -include $(deps)
