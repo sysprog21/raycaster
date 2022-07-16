@@ -17,7 +17,7 @@ Renderer RendererConstruct(RayCaster *rc)
 
 void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
 {
-    RayCasterStart(renderer->rc, g->playerX, g->playerY, g->playerA);
+    renderer->rc->Start(renderer->rc, g->playerX, g->playerY, g->playerA);
 
     for (int x = 0; x < SCREEN_WIDTH; x++) {
         uint8_t sso;
@@ -27,7 +27,7 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
         uint16_t tst;
         uint32_t *lb = fb + x;
 
-        RayCasterTrace(renderer->rc, x, &sso, &tn, &tc, &tso, &tst);
+        renderer->rc->Trace(renderer->rc, x, &sso, &tn, &tc, &tso, &tst);
 
         const int tx = (int) (tc >> 2);
         int16_t ws = HORIZON_HEIGHT - sso;

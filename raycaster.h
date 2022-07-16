@@ -28,24 +28,23 @@
 #define RayCaster struct RayCaster_
 
 struct RayCaster_ {
-    uint16_t playerX;
-    uint16_t playerY;
-    int16_t playerA;
-    uint8_t viewQuarter;
-    uint8_t viewAngle;
+    void *derived;
+
+    void (*Destruct)(RayCaster *rayCaster);
+
+    void (*Start)(RayCaster *rayCaster,
+                  uint16_t playerX,
+                  uint16_t playerY,
+                  int16_t playerA);
+    void (*Trace)(RayCaster *rayCaster,
+                  uint16_t screenX,
+                  uint8_t *screenY,
+                  uint8_t *textureNo,
+                  uint8_t *textureX,
+                  uint16_t *textureY,
+                  uint16_t *textureStep);
 };
 
-RayCaster RayCasterConstruct(void);
+RayCaster *RayCasterConstruct(void);
 
-void RayCasterStart(RayCaster *rayCaster,
-                    uint16_t playerX,
-                    uint16_t playerY,
-                    int16_t playerA);
-
-void RayCasterTrace(RayCaster *rayCaster,
-                    uint16_t screenX,
-                    uint8_t *screenY,
-                    uint8_t *textureNo,
-                    uint8_t *textureX,
-                    uint16_t *textureY,
-                    uint16_t *textureStep);
+void RayCasterDestruct(RayCaster *rayCaster);
