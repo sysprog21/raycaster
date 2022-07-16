@@ -1,12 +1,11 @@
 BIN = main precalculator
 
-CXXFLAGS = -std=c++11 -O2 -Wall -g
-CFLAGS = -std=c11 -O2 -Wall -g -D_GNU_SOURCE
-LDFLAGS = -lm -ldl
+CC = arm-none-eabi-gcc
+AS = arm-none-eabi-as
 
-# SDL
-CFLAGS += `sdl2-config --cflags`
-LDFLAGS += `sdl2-config --libs`
+CXXFLAGS = -std=c++11 -O2 -Wall -g
+CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding -std=gnu11 -O2 -Wall -Wextra
+LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib
 
 # Control the build verbosity
 ifeq ("$(VERBOSE)","1")
@@ -27,33 +26,33 @@ $(GIT_HOOKS):
 	@echo
 	
 OBJS := \
+	boot.o \
+	main.o \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \
 	raycaster_data.o \
 	renderer.o \
-	raycaster_tables.o \
-	main.o
-deps := $(OBJS:%.o=.%.o.d)
+	raycaster_tables.o
 
-precalculator.o: tools/precalculator.cpp
+precalculator: tools/precalculator.cpp
 	$(VECHO) "  CXX\t$@\n"
-	$(Q)$(CXX) -o $@ $(CXXFLAGS) -c -I . $<
-
-precalculator: precalculator.o
-	$(Q)$(CXX) -o $@ $^ $(LDFLAGS)
+	$(Q)$(CXX) -o $@ $(CXXFLAGS) -I . $<
 
 raycaster_tables.c: precalculator
 	./precalculator > $@
 
 %.o: %.c
 	$(VECHO) "  C\t$@\n"
-	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
+	$(Q)$(CC) -o $@ $(CFLAGS) -c $<
+
+%.o: %.S
+	$(Q)$(AS) -o $@ $(ASFLAGS) $<
 
 main: $(OBJS)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
 
 clean:
-	$(RM) $(BIN) $(OBJS) $(deps) raycaster_tables.c
+	$(RM) $(BIN) $(OBJS) raycaster_tables.c
 
 -include $(deps)
