@@ -82,8 +82,7 @@ int main(int argc, char *args[])
             int moveDirection = 0;
             int rotateDirection = 0;
             bool isExiting = false;
-            const int tickFrequency = SDL_GetPerformanceFrequency();
-            int tickCounter = SDL_GetPerformanceCounter();
+            Uint32 tickCounter = SDL_GetTicks();
             SDL_Event event;
 
             SDL_Renderer *sdlRenderer = SDL_CreateRenderer(
@@ -92,9 +91,6 @@ int main(int argc, char *args[])
             SDL_Texture *fixedTexture = SDL_CreateTexture(
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-            float elapsed = 0.0f;
-            int frames = 0;
 
             while (!isExiting) {
                 RendererTraceFrame(&fixedRenderer, &game, fixedBuffer);
@@ -107,22 +103,10 @@ int main(int argc, char *args[])
                     isExiting =
                         ProcessEvent(event, &moveDirection, &rotateDirection);
                 }
-                const int nextCounter = SDL_GetPerformanceCounter();
-                const float seconds =
-                    (nextCounter - tickCounter) / ((float) tickFrequency);
+                const Uint32 nextCounter = SDL_GetTicks();
+                const Uint32 ticks = nextCounter - tickCounter;
                 tickCounter = nextCounter;
-                elapsed += seconds;
-                if (elapsed >= 1.0f) {
-                    char title[64];
-                    sprintf(title, "Fixed-Point RayCaster FPS: %.2f",
-                            frames / elapsed);
-                    SDL_SetWindowTitle(sdlWindow, title);
-                    elapsed -= 1.0f;
-                    frames = 0;
-                }
-                GameMove(&game, moveDirection, rotateDirection,
-                         (uint16_t) (seconds * 256.0f));
-                ++frames;
+                GameMove(&game, moveDirection, rotateDirection, ticks >> 2);
             }
             SDL_DestroyTexture(fixedTexture);
             SDL_DestroyRenderer(sdlRenderer);
