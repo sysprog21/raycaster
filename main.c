@@ -67,20 +67,16 @@ int main(int argc, char *args[])
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     } else {
-        SDL_Window *sdlWindow =
-            SDL_CreateWindow("RayCaster [fixed-point vs. floating-point]",
-                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                             SCREEN_SCALE * (SCREEN_WIDTH * 2 + 1),
-                             SCREEN_SCALE * SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        SDL_Window *sdlWindow = SDL_CreateWindow(
+            "Fixed-Point RayCaster", SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED, SCREEN_SCALE * SCREEN_WIDTH,
+            SCREEN_SCALE * SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
         if (sdlWindow == NULL) {
             printf("Window could not be created! SDL_Error: %s\n",
                    SDL_GetError());
         } else {
             Game game = GameConstruct();
-            RayCaster *floatCaster = RayCasterFloatConstruct();
-            Renderer floatRenderer = RendererConstruct(floatCaster);
-            uint32_t floatBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
             RayCaster *fixedCaster = RayCasterFixedConstruct();
             Renderer fixedRenderer = RendererConstruct(fixedCaster);
             uint32_t fixedBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -96,20 +92,14 @@ int main(int argc, char *args[])
             SDL_Texture *fixedTexture = SDL_CreateTexture(
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
-            SDL_Texture *floatTexture = SDL_CreateTexture(
-                sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
-                SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             float elapsed = 0.0f;
             int frames = 0;
 
             while (!isExiting) {
-                RendererTraceFrame(&floatRenderer, &game, floatBuffer);
                 RendererTraceFrame(&fixedRenderer, &game, fixedBuffer);
 
                 DrawBuffer(sdlRenderer, fixedTexture, fixedBuffer, 0);
-                DrawBuffer(sdlRenderer, floatTexture, floatBuffer,
-                           SCREEN_WIDTH + 1);
 
                 SDL_RenderPresent(sdlRenderer);
 
@@ -124,10 +114,8 @@ int main(int argc, char *args[])
                 elapsed += seconds;
                 if (elapsed >= 1.0f) {
                     char title[64];
-                    sprintf(
-                        title,
-                        "RayCaster [fixed-point vs. floating-point] FPS: %.2f",
-                        frames / elapsed);
+                    sprintf(title, "Fixed-Point RayCaster FPS: %.2f",
+                            frames / elapsed);
                     SDL_SetWindowTitle(sdlWindow, title);
                     elapsed -= 1.0f;
                     frames = 0;
@@ -135,12 +123,10 @@ int main(int argc, char *args[])
                 GameMove(&game, moveDirection, rotateDirection, seconds);
                 ++frames;
             }
-            SDL_DestroyTexture(floatTexture);
             SDL_DestroyTexture(fixedTexture);
             SDL_DestroyRenderer(sdlRenderer);
             SDL_DestroyWindow(sdlWindow);
             fixedCaster->Destruct(fixedCaster);
-            floatCaster->Destruct(floatCaster);
         }
     }
 
