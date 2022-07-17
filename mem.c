@@ -59,7 +59,7 @@ void *kmalloc(size_t size)
 
     best->allocated = true;
 
-    return best;
+    return (void *) best + sizeof(HeapSegmentHeader);
 }
 
 void kfree(void *ptr)
