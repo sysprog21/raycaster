@@ -31,6 +31,7 @@ OBJS := \
 	mmio_asm.o \
 	uart.o \
 	mem.o \
+	string.o \
 	mailbox.o \
 	fb.o \
 	game.o \
