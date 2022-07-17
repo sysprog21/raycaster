@@ -52,6 +52,7 @@ void *kmalloc(size_t size)
     if (bestDiff > sizeof(HeapSegmentHeader) * 2) {
         HeapSegmentHeader *oldNext = best->next;
         best->next = (void *) best + size;
+        best->next->allocated = false;
         best->next->size = best->size - size;
         best->next->next = oldNext;
         best->next->prev = best;

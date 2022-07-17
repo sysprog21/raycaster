@@ -33,8 +33,7 @@ static void RayCasterFixedDestruct(RayCaster *rayCaster);
 RayCaster *RayCasterFixedConstruct(void)
 {
     RayCaster *rayCaster = RayCasterConstruct();
-    RayCasterFixed *rayCasterFixed =
-        (RayCasterFixed *) kmalloc(sizeof(RayCasterFixed));
+    RayCasterFixed *rayCasterFixed = kmalloc(sizeof(RayCasterFixed));
     if (!rayCasterFixed) {
         rayCaster->Destruct(rayCaster);
         return NULL;

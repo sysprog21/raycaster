@@ -8,7 +8,7 @@ void RayCasterDestruct(RayCaster *rayCaster);
 
 RayCaster *RayCasterConstruct(void)
 {
-    RayCaster *rayCaster = (RayCaster *) kmalloc(sizeof(RayCaster));
+    RayCaster *rayCaster = kmalloc(sizeof(RayCaster));
     if (!rayCaster) {
         return NULL;
     }
