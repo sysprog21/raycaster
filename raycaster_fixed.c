@@ -1,8 +1,9 @@
-// fixed-point implementation
-
 #include "raycaster_fixed.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
+
+#include "memory.h"
 #include "raycaster_data.h"
 #include "raycaster_tables.h"
 
@@ -33,7 +34,7 @@ RayCaster *RayCasterFixedConstruct(void)
 {
     RayCaster *rayCaster = RayCasterConstruct();
     RayCasterFixed *rayCasterFixed =
-        (RayCasterFixed *) malloc(sizeof(RayCasterFixed));
+        (RayCasterFixed *) kmalloc(sizeof(RayCasterFixed));
     if (!rayCasterFixed) {
         rayCaster->Destruct(rayCaster);
         return NULL;
@@ -385,6 +386,6 @@ static void RayCasterFixedTrace(RayCaster *rayCaster,
 
 static void RayCasterFixedDestruct(RayCaster *rayCaster)
 {
-    free(rayCaster->derived);
+    kfree(rayCaster->derived);
     RayCasterDestruct(rayCaster);
 }

@@ -4,33 +4,31 @@
 
 #include "mmio.h"
 
-enum {
-    GPIO_BASE = 0x20200000,
+#define GPIO_BASE 0x20200000
 
-    GPPUD = (GPIO_BASE + 0x94),
-    GPPUDCLK0 = (GPIO_BASE + 0x98),
+#define GPPUD (GPIO_BASE + 0x94)
+#define GPPUDCLK0 (GPIO_BASE + 0x98)
 
-    UART_BASE = 0x20201000,
+#define UART_BASE 0x20201000
 
-    UART_DR = (UART_BASE + 0x00),
-    UART_RSRECR = (UART_BASE + 0x04),
-    UART_FR = (UART_BASE + 0x18),
-    UART_ILPR = (UART_BASE + 0x20),
-    UART_IBRD = (UART_BASE + 0x24),
-    UART_FBRD = (UART_BASE + 0x28),
-    UART_LCRH = (UART_BASE + 0x2C),
-    UART_CR = (UART_BASE + 0x30),
-    UART_IFLS = (UART_BASE + 0x34),
-    UART_IMSC = (UART_BASE + 0x38),
-    UART_RIS = (UART_BASE + 0x3C),
-    UART_MIS = (UART_BASE + 0x40),
-    UART_ICR = (UART_BASE + 0x44),
-    UART_DMACR = (UART_BASE + 0x48),
-    UART_ITCR = (UART_BASE + 0x80),
-    UART_ITIP = (UART_BASE + 0x84),
-    UART_ITOP = (UART_BASE + 0x88),
-    UART_TDR = (UART_BASE + 0x8C),
-};
+#define UART_DR (UART_BASE + 0x00)
+#define UART_RSRECR (UART_BASE + 0x04)
+#define UART_FR (UART_BASE + 0x18)
+#define UART_ILPR (UART_BASE + 0x20)
+#define UART_IBRD (UART_BASE + 0x24)
+#define UART_FBRD (UART_BASE + 0x28)
+#define UART_LCRH (UART_BASE + 0x2C)
+#define UART_CR (UART_BASE + 0x30)
+#define UART_IFLS (UART_BASE + 0x34)
+#define UART_IMSC (UART_BASE + 0x38)
+#define UART_RIS (UART_BASE + 0x3C)
+#define UART_MIS (UART_BASE + 0x40)
+#define UART_ICR (UART_BASE + 0x44)
+#define UART_DMACR (UART_BASE + 0x48)
+#define UART_ITCR (UART_BASE + 0x80)
+#define UART_ITIP (UART_BASE + 0x84)
+#define UART_ITOP (UART_BASE + 0x88)
+#define UART_TDR (UART_BASE + 0x8C)
 
 void uart_init()
 {

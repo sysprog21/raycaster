@@ -30,7 +30,7 @@ OBJS := \
 	main.o \
 	mmio_asm.o \
 	uart.o \
-	stdlib.o \
+	memory.o \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \

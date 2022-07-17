@@ -1,12 +1,14 @@
 #include "raycaster.h"
 
-#include <stdlib.h>
+#include <stddef.h>
+
+#include "memory.h"
 
 void RayCasterDestruct(RayCaster *rayCaster);
 
 RayCaster *RayCasterConstruct(void)
 {
-    RayCaster *rayCaster = (RayCaster *) malloc(sizeof(RayCaster));
+    RayCaster *rayCaster = (RayCaster *) kmalloc(sizeof(RayCaster));
     if (!rayCaster) {
         return NULL;
     }
@@ -21,5 +23,5 @@ RayCaster *RayCasterConstruct(void)
 
 void RayCasterDestruct(RayCaster *rayCaster)
 {
-    free(rayCaster);
+    kfree(rayCaster);
 }
