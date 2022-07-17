@@ -45,7 +45,7 @@ void mailbox_write(uint8_t channel, uint32_t data)
 {
     while (mmio_read(MAILBOX_STATUS) & MAIL_FULL)
         ;
-    mmio_write(MAILBOX_WRITE, data | channel);
+    mmio_write(MAILBOX_WRITE, data << 4 | channel);
 }
 
 uint32_t get_value_buffer_size(uint32_t tag)
@@ -82,8 +82,8 @@ int mailbox_send_messages(PropertyMessageTag *tags)
     }
     buffer->tags[pos] = NULL_TAG;
 
-    mailbox_write(MAILBOX_PROPERTY_CHANNEL, (uint32_t) buffer);
-    mailbox_read(MAILBOX_PROPERTY_CHANNEL);
+    mailbox_write(MAILBOX_PROPERTY_CHANNEL, (uint32_t) buffer >> 4);
+    (void) mailbox_read(MAILBOX_PROPERTY_CHANNEL);
 
     if (buffer->code == MESSAGE_CODE_REQUEST) {
         kfree(buffer);

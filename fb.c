@@ -21,6 +21,8 @@ void *fb_create(uint32_t width, uint32_t height, uint32_t depth)
     }
 
     tags[0].tag = FB_ALLOCATE_TAG;
+    tags[0].value.fbScreenSize.width = 0;
+    tags[0].value.fbScreenSize.height = 0;
     tags[0].value.fbAllocateAlignment = 16;
     tags[1].tag = NULL_TAG;
     if (mailbox_send_messages(tags) != 0) {
