@@ -20,5 +20,6 @@ SECTIONS {
         *(.bss)
     }
 
+    . = ALIGN(16);
     __end = .;
 }

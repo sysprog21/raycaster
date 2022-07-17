@@ -8,11 +8,11 @@
 #define HeapSegmentHeader struct HeapSegmentHeader_
 
 struct HeapSegmentHeader_ {
-    bool allocated;
-    size_t size;
+    uint32_t allocated;
+    uint32_t size;
     HeapSegmentHeader *prev;
     HeapSegmentHeader *next;
-};
+} __attribute__((packed));
 
 extern uint8_t __end;
 
@@ -30,6 +30,7 @@ void mem_init(void)
 void *kmalloc(size_t size)
 {
     size += sizeof(HeapSegmentHeader);
+    size += size % 16 ? 16 - (size % 16) : 0;
 
     HeapSegmentHeader *best = NULL;
     size_t bestDiff = SIZE_MAX;
@@ -59,7 +60,7 @@ void *kmalloc(size_t size)
 
     best->allocated = true;
 
-    return (void *) best + sizeof(HeapSegmentHeader);
+    return best + 1;
 }
 
 void kfree(void *ptr)

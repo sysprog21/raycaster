@@ -30,3 +30,5 @@ void mailbox_write(uint8_t channel, uint32_t data)
         ;
     mmio_write(MAILBOX_WRITE, (data << 4) | channel);
 }
+
+void mailbox_send_messages(PropertyMessage *messages) {}

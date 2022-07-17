@@ -32,6 +32,7 @@ OBJS := \
 	uart.o \
 	mem.o \
 	mailbox.o \
+	fb.o \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \
