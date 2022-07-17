@@ -6,8 +6,8 @@
 
 #define GPIO_BASE 0x20200000
 
-#define GPPUD (GPIO_BASE + 0x94)
-#define GPPUDCLK0 (GPIO_BASE + 0x98)
+#define GPIO_GPPUD (GPIO_BASE + 0x94)
+#define GPIO_GPPUDCLK0 (GPIO_BASE + 0x98)
 
 #define UART_BASE 0x20201000
 
@@ -34,13 +34,13 @@ void uart_init()
 {
     mmio_write(UART_CR, 0x00000000);
 
-    mmio_write(GPPUD, 0x00000000);
+    mmio_write(GPIO_GPPUD, 0x00000000);
     delay(150);
 
-    mmio_write(GPPUDCLK0, (1 << 14) | (1 << 15));
+    mmio_write(GPIO_GPPUDCLK0, (1 << 14) | (1 << 15));
     delay(150);
 
-    mmio_write(GPPUDCLK0, 0x00000000);
+    mmio_write(GPIO_GPPUDCLK0, 0x00000000);
 
     mmio_write(UART_ICR, 0x7FF);
 
