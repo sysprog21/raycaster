@@ -1,16 +1,11 @@
-#include <stddef.h>
-#include <stdlib.h>
+#include "uart.h"
 
-void *malloc(size_t size)
+void kmain()
 {
-    (void) size;
-
-    return NULL;
+    uart_init();
+    uart_puts("Hello world!\n");
+    while (1) {
+        uart_putc(uart_getc());
+        uart_putc('\n');
+    }
 }
-
-void free(void *ptr)
-{
-    (void) ptr;
-}
-
-void kmain() {}

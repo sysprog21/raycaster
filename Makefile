@@ -1,4 +1,4 @@
-BIN = main precalculator
+BIN = kernel.elf precalculator
 
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
@@ -28,6 +28,9 @@ $(GIT_HOOKS):
 OBJS := \
 	boot.o \
 	main.o \
+	mmio_asm.o \
+	uart.o \
+	stdlib.o \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \
@@ -49,8 +52,11 @@ raycaster_tables.c: precalculator
 %.o: %.S
 	$(Q)$(AS) -o $@ $(ASFLAGS) $<
 
-main: $(OBJS)
+kernel.elf: $(OBJS)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
+
+run: kernel.elf
+	qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel kernel.elf
 
 clean:
 	$(RM) $(BIN) $(OBJS) raycaster_tables.c

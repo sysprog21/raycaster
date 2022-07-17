@@ -2,8 +2,7 @@
 *.o
 raycaster_tables.c
 
-main
+kernel.elf
 precalculator
 
 .vscode
-null.d
