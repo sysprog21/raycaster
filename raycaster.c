@@ -2,7 +2,7 @@
 
 #include <stddef.h>
 
-#include "memory.h"
+#include "mem.h"
 
 void RayCasterDestruct(RayCaster *rayCaster);
 

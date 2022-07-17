@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "memory.h"
+#include "mem.h"
 #include "raycaster_data.h"
 #include "raycaster_tables.h"
 

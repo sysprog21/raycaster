@@ -19,4 +19,6 @@ SECTIONS {
     .bss : {
         *(.bss)
     }
+
+    __end = .;
 }

@@ -1,10 +1,12 @@
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef MEM_H
+#define MEM_H
 
 #include <stddef.h>
+
+void mem_init(void);
 
 void *kmalloc(size_t size);
 
 void kfree(void *ptr);
 
-#endif  // MEMORY_H
+#endif  // MEM_H

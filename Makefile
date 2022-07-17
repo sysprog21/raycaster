@@ -30,7 +30,7 @@ OBJS := \
 	main.o \
 	mmio_asm.o \
 	uart.o \
-	memory.o \
+	mem.o \
 	game.o \
 	raycaster.o \
 	raycaster_fixed.o \
@@ -56,7 +56,7 @@ kernel.elf: $(OBJS)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS)
 
 run: kernel.elf
-	qemu-system-arm -m 512 -M raspi0 -serial stdio -kernel kernel.elf
+	qemu-system-arm -M raspi0 -kernel kernel.elf -serial stdio
 
 clean:
 	$(RM) $(BIN) $(OBJS) raycaster_tables.c
