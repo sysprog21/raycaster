@@ -16,8 +16,10 @@ SECTIONS {
         *(.data)
     }
 
-    .bss : {
+    .bss (NOLOAD) : {
+        __bss_start = .;
         *(.bss)
+        __bss_end = .;
     }
 
     . = ALIGN(16);
