@@ -1,5 +1,6 @@
 *.o.d
 *.o
+null.d
 raycaster_tables.c
 
 kernel.elf

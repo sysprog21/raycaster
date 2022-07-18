@@ -8,9 +8,9 @@
 Game GameConstruct(void)
 {
     Game game;
-    game.playerX = 5895;  // 23.03f * 256.0f
-    game.playerY = 1740;  // 6.8f * 256.0f
-    game.playerA = 1344;  // 5.25f * 256.0f
+    game.playerX = 5895;  // (uint16_t) (23.03f * 256)
+    game.playerY = 1740;  // (uint16_t) (6.8f * 256)
+    game.playerA = 320;   // (uint16_t) (5.25f * 256) - 1024
     return game;
 }
 
