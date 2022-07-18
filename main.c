@@ -33,11 +33,12 @@ void kmain()
     Renderer renderer = RendererConstruct(rayCaster);
 
     uint32_t *fb = fb_create(FB_WIDTH, FB_HEIGHT, 32);
-    uint64_t tickCounter = timer_clock();
+    uint64_t tickCounter = timer_clock(), elapsed = 0;
+    int frameCounter = 0, frameRate = 0;
     for (;;) {
         RendererTraceFrame(&renderer, &game, buffer);
         char fpsbuf[64] = "FPS: ";
-        itoa(100, fpsbuf + 5, 10);
+        itoa(frameRate, fpsbuf + 5, 10);
         fb_puts(buffer, SCREEN_WIDTH, SCREEN_HEIGHT, g_font, fpsbuf, 0, 0);
         CopyBuffer(fb, buffer);
 
@@ -63,6 +64,13 @@ void kmain()
         uint64_t nextCounter = timer_clock();
         uint64_t ticks = nextCounter - tickCounter;
         tickCounter = nextCounter;
+        elapsed += ticks;
+        ++frameCounter;
+        if (elapsed > 1000000) {
+            frameRate = frameCounter;
+            frameCounter = 0;
+            elapsed -= 1000000;
+        }
         GameMove(&game, m, r, ticks >> 12);
     }
 
