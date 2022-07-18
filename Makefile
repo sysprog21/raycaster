@@ -33,6 +33,7 @@ OBJS := \
 	mem.o \
 	string.o \
 	mailbox.o \
+	timer.o \
 	fb.o \
 	game.o \
 	raycaster.o \

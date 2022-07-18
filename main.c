@@ -5,6 +5,7 @@
 #include "mem.h"
 #include "raycaster_fixed.h"
 #include "renderer.h"
+#include "timer.h"
 #include "uart.h"
 
 void copy_buffer(uint32_t *fb, uint32_t *buffer)
@@ -30,9 +31,12 @@ void kmain()
     Renderer renderer = RendererConstruct(rayCaster);
 
     uint32_t *fb = fb_create(FB_WIDTH, FB_HEIGHT, 32);
+    uint64_t tickCounter = timer_clock();
     for (;;) {
-        int m = 0, r = 0;
+        RendererTraceFrame(&renderer, &game, buffer);
+        copy_buffer(fb, buffer);
 
+        int m = 0, r = 0;
         if (!uart_empty()) {
             char c = uart_getc();
             switch (c) {
@@ -51,9 +55,10 @@ void kmain()
             }
         }
 
-        GameMove(&game, m, r, 10);
-        RendererTraceFrame(&renderer, &game, buffer);
-        copy_buffer(fb, buffer);
+        uint64_t nextCounter = timer_clock();
+        uint64_t ticks = nextCounter - tickCounter;
+        tickCounter = nextCounter;
+        GameMove(&game, m, r, ticks >> 12);
     }
 
     rayCaster->Destruct(rayCaster);
