@@ -40,6 +40,7 @@ OBJS := \
 	raycaster_data.o \
 	renderer.o \
 	raycaster_tables.o
+deps := $(OBJS:%.o=.%.o.d)
 
 precalculator: tools/precalculator.cpp
 	$(VECHO) "  CXX\t$@\n"
@@ -50,7 +51,7 @@ raycaster_tables.c: precalculator
 
 %.o: %.c
 	$(VECHO) "  C\t$@\n"
-	$(Q)$(CC) -o $@ $(CFLAGS) -c $<
+	$(Q)$(CC) -o $@ $(CFLAGS) -c -MMD -MF .$@.d $<
 
 %.o: %.S
 	$(Q)$(AS) -o $@ $(ASFLAGS) $<
@@ -62,6 +63,6 @@ run: kernel.elf
 	qemu-system-arm -M raspi0 -kernel kernel.elf -serial stdio
 
 clean:
-	$(RM) $(BIN) $(OBJS) raycaster_tables.c
+	$(RM) $(BIN) $(OBJS) $(deps) raycaster_tables.c
 
 -include $(deps)
