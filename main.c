@@ -3,6 +3,7 @@
 #include "fb.h"
 #include "game.h"
 #include "mem.h"
+#include "raycaster_data.h"
 #include "raycaster_fixed.h"
 #include "renderer.h"
 #include "timer.h"
@@ -34,6 +35,7 @@ void kmain()
     uint64_t tickCounter = timer_clock();
     for (;;) {
         RendererTraceFrame(&renderer, &game, buffer);
+        fb_puts(buffer, SCREEN_WIDTH, SCREEN_HEIGHT, g_font, "FPS: 0", 0, 0);
         CopyBuffer(fb, buffer);
 
         int m = 0, r = 0;
