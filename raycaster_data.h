@@ -6,7 +6,9 @@
 
 extern const uint8_t LOOKUP_TBL g_map[128];
 
-extern const uint32_t LOOKUP_TBL g_texture8[4096];
+extern const uint32_t LOOKUP_TBL g_texture32[4096];
+
+extern const uint8_t LOOKUP_TBL g_font[128][16];
 
 inline bool MapIsWall(uint8_t tileX, uint8_t tileY)
 {
