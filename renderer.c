@@ -11,17 +11,12 @@ inline static uint32_t MultScalarRGBA(uint16_t scalar, uint32_t rgba)
            ((uint8_t) UMULT(scalar, (rgba >> 0) & 0xFF) << 0);
 }
 
-inline static uint32_t AddRGBARGBA(uint32_t rgba1, uint32_t rgba2)
+inline static uint32_t AddRGBA(uint32_t rgba1, uint32_t rgba2)
 {
     return (((uint8_t) (rgba1 >> 24) + (uint8_t) (rgba2 >> 24)) << 24) |
            (((uint8_t) (rgba1 >> 16) + (uint8_t) (rgba2 >> 16)) << 16) |
            (((uint8_t) (rgba1 >> 8) + (uint8_t) (rgba2 >> 8)) << 8) |
            (((uint8_t) (rgba1 >> 0) + (uint8_t) (rgba2 >> 0)) << 0);
-}
-
-inline static uint32_t GetRGBA(uint8_t brightness)
-{
-    return (brightness << 16) + (brightness << 8) + brightness;
 }
 
 Renderer RendererConstruct(RayCaster *rc)
@@ -55,7 +50,7 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
         uint16_t ts = tst;
 
         for (int y = 0; y < ws; y++) {
-            *lb = AddRGBARGBA(
+            *lb = AddRGBA(
                 MultScalarRGBA(96 + (HORIZON_HEIGHT - y), 0xFFFFB380),
                 MultScalarRGBA(255 - (96 + (HORIZON_HEIGHT - y)), 0xFFFFFFFF));
             lb += SCREEN_WIDTH;
@@ -64,20 +59,23 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
         for (int y = 0; y < sso * 2; y++) {
             // paint texture pixel
             int ty = (int) (to >> 10);
-            uint8_t tv = g_texture8[(ty << 6) + tx];
+            uint32_t tv = g_texture8[(ty << 6) + tx];
 
             to += ts;
 
             if (tn == 1 && tv > 0) {
                 // dark wall
-                tv >>= 1;
+                tv = ((uint8_t) (tv >> 24) << 24) |
+                     (((uint8_t) (tv >> 16) >> 1) << 16) |
+                     (((uint8_t) (tv >> 8) >> 1) << 8) |
+                     (((uint8_t) (tv >> 0) >> 1) << 0);
             }
-            *lb = GetRGBA(tv);
+            *lb = tv;
             lb += SCREEN_WIDTH;
         }
 
         for (int y = 0; y < ws; y++) {
-            *lb = AddRGBARGBA(
+            *lb = AddRGBA(
                 MultScalarRGBA(96 + (HORIZON_HEIGHT - (ws - y)), 0xFF53769B),
                 MultScalarRGBA(255 - (96 + (HORIZON_HEIGHT - (ws - y))),
                                0xFFFFFFFF));
