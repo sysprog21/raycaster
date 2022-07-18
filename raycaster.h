@@ -7,6 +7,8 @@
 
 #define SCREEN_WIDTH (uint16_t) 320
 #define SCREEN_HEIGHT (uint16_t) 256
+#define FB_WIDTH (SCREEN_WIDTH * SCREEN_SCALE)
+#define FB_HEIGHT (SCREEN_HEIGHT * SCREEN_SCALE)
 #define SCREEN_SCALE 2
 #define LOOKUP_TBL
 #define LOOKUP8(tbl, offset) tbl[offset]
