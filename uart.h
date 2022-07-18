@@ -1,9 +1,13 @@
 #ifndef UART_H
 #define UART_H
 
-void uart_init();
+#include <stdbool.h>
 
-char uart_getc();
+void uart_init(void);
+
+bool uart_empty(void);
+
+char uart_getc(void);
 
 void uart_putc(char c);
 

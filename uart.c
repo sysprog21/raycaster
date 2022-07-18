@@ -30,7 +30,10 @@
 #define UART_ITOP (UART_BASE + 0x88)
 #define UART_TDR (UART_BASE + 0x8C)
 
-void uart_init()
+#define UART_FULL 0x00000020
+#define UART_EMPTY 0x00000010
+
+void uart_init(void)
 {
     mmio_write(UART_CR, 0x00000000);
 
@@ -57,14 +60,19 @@ void uart_init()
 
 void uart_putc(char c)
 {
-    while (mmio_read(UART_FR) & (1 << 5))
+    while (mmio_read(UART_FR) & UART_FULL)
         ;
     mmio_write(UART_DR, c);
 }
 
-char uart_getc()
+bool uart_empty(void)
 {
-    while (mmio_read(UART_FR) & (1 << 4))
+    return mmio_read(UART_FR) & UART_EMPTY;
+}
+
+char uart_getc(void)
+{
+    while (mmio_read(UART_FR) & UART_EMPTY)
         ;
     return mmio_read(UART_DR);
 }
