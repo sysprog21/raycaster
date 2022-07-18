@@ -3,7 +3,23 @@
 #include <stdlib.h>
 #include "raycaster_data.h"
 
-inline static uint32_t GetARGB(uint8_t brightness)
+inline static uint32_t MultScalarRGBA(uint16_t scalar, uint32_t rgba)
+{
+    return ((uint8_t) UMULT(scalar, (rgba >> 24) & 0xFF) << 24) |
+           ((uint8_t) UMULT(scalar, (rgba >> 16) & 0xFF) << 16) |
+           ((uint8_t) UMULT(scalar, (rgba >> 8) & 0xFF) << 8) |
+           ((uint8_t) UMULT(scalar, (rgba >> 0) & 0xFF) << 0);
+}
+
+inline static uint32_t AddRGBARGBA(uint32_t rgba1, uint32_t rgba2)
+{
+    return (((uint8_t) (rgba1 >> 24) + (uint8_t) (rgba2 >> 24)) << 24) |
+           (((uint8_t) (rgba1 >> 16) + (uint8_t) (rgba2 >> 16)) << 16) |
+           (((uint8_t) (rgba1 >> 8) + (uint8_t) (rgba2 >> 8)) << 8) |
+           (((uint8_t) (rgba1 >> 0) + (uint8_t) (rgba2 >> 0)) << 0);
+}
+
+inline static uint32_t GetRGBA(uint8_t brightness)
 {
     return (brightness << 16) + (brightness << 8) + brightness;
 }
@@ -39,7 +55,9 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
         uint16_t ts = tst;
 
         for (int y = 0; y < ws; y++) {
-            *lb = GetARGB(96 + (HORIZON_HEIGHT - y));
+            *lb = AddRGBARGBA(
+                MultScalarRGBA(96 + (HORIZON_HEIGHT - y), 0xFFFFB380),
+                MultScalarRGBA(255 - (96 + (HORIZON_HEIGHT - y)), 0xFFFFFFFF));
             lb += SCREEN_WIDTH;
         }
 
@@ -54,12 +72,15 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
                 // dark wall
                 tv >>= 1;
             }
-            *lb = GetARGB(tv);
+            *lb = GetRGBA(tv);
             lb += SCREEN_WIDTH;
         }
 
         for (int y = 0; y < ws; y++) {
-            *lb = GetARGB(96 + (HORIZON_HEIGHT - (ws - y)));
+            *lb = AddRGBARGBA(
+                MultScalarRGBA(96 + (HORIZON_HEIGHT - (ws - y)), 0xFF53769B),
+                MultScalarRGBA(255 - (96 + (HORIZON_HEIGHT - (ws - y))),
+                               0xFFFFFFFF));
             lb += SCREEN_WIDTH;
         }
     }

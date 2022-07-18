@@ -8,7 +8,7 @@
 #include "timer.h"
 #include "uart.h"
 
-void copy_buffer(uint32_t *fb, uint32_t *buffer)
+void CopyBuffer(uint32_t *fb, uint32_t *buffer)
 {
     for (uint16_t x = 0; x < SCREEN_WIDTH; ++x) {
         for (uint16_t y = 0; y < SCREEN_HEIGHT; ++y) {
@@ -34,7 +34,7 @@ void kmain()
     uint64_t tickCounter = timer_clock();
     for (;;) {
         RendererTraceFrame(&renderer, &game, buffer);
-        copy_buffer(fb, buffer);
+        CopyBuffer(fb, buffer);
 
         int m = 0, r = 0;
         if (!uart_empty()) {
