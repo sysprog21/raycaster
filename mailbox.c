@@ -51,9 +51,12 @@ void mailbox_write(uint8_t channel, uint32_t data)
 uint32_t get_value_buffer_size(uint32_t tag)
 {
     switch (tag) {
+    case CLOCK_SET_RATE:
+        return 12;
     case FB_ALLOCATE_TAG:
     case FB_SET_PHYSICAL_SIZE:
     case FB_SET_VIRTUAL_SIZE:
+    case CLOCK_GET_MAX_RATE:
         return 8;
     case FB_SET_DEPTH:
         return 4;
