@@ -5,7 +5,7 @@ AS = arm-none-eabi-as
 
 CXXFLAGS = -std=c++11 -O2 -Wall -g
 CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding -std=gnu11 -O2 -Wall -Wextra
-LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib
+LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 
 # Control the build verbosity
 ifeq ("$(VERBOSE)","1")
@@ -32,6 +32,7 @@ OBJS := \
 	uart.o \
 	mem.o \
 	string.o \
+	stdlib.o \
 	mailbox.o \
 	timer.o \
 	fb.o \

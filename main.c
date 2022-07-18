@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "fb.h"
 #include "game.h"
@@ -35,7 +36,9 @@ void kmain()
     uint64_t tickCounter = timer_clock();
     for (;;) {
         RendererTraceFrame(&renderer, &game, buffer);
-        fb_puts(buffer, SCREEN_WIDTH, SCREEN_HEIGHT, g_font, "FPS: 0", 0, 0);
+        char fpsbuf[64] = "FPS: ";
+        itoa(100, fpsbuf + 5, 10);
+        fb_puts(buffer, SCREEN_WIDTH, SCREEN_HEIGHT, g_font, fpsbuf, 0, 0);
         CopyBuffer(fb, buffer);
 
         int m = 0, r = 0;
