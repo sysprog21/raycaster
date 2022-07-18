@@ -102,15 +102,6 @@ static int16_t RayCasterFixedMulTan(uint8_t value,
     return RayCasterFixedMulU(signedValue, LOOKUP16(lookupTable, angle));
 }
 
-inline bool RayCasterFixedIsWall(uint8_t tileX, uint8_t tileY)
-{
-    if (tileX >= MAP_X - 1 || tileY >= MAP_Y - 1) {
-        return true;
-    }
-    return LOOKUP8(g_map, (tileX >> 3) + (tileY << (MAP_XS - 3))) &
-           (1 << (8 - (tileX & 0x7)));
-}
-
 static void RayCasterFixedLookupHeight(uint16_t distance,
                                        uint8_t *height,
                                        uint16_t *step)
@@ -163,7 +154,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             }
             for (;;) {
                 tileY += tileStepY;
-                if (RayCasterFixedIsWall(tileX, tileY)) {
+                if (MapIsWall(tileX, tileY)) {
                     goto HorizontalHit;
                 }
             }
@@ -176,7 +167,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             }
             for (;;) {
                 tileX += tileStepX;
-                if (RayCasterFixedIsWall(tileX, tileY)) {
+                if (MapIsWall(tileX, tileY)) {
                     goto VerticalHit;
                 }
             }
@@ -226,7 +217,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             while ((tileStepY == 1 && (interceptY >> 8 < tileY)) ||
                    (tileStepY == -1 && (interceptY >> 8 >= tileY))) {
                 tileX += tileStepX;
-                if (RayCasterFixedIsWall(tileX, tileY)) {
+                if (MapIsWall(tileX, tileY)) {
                     goto VerticalHit;
                 }
                 interceptY += stepY;
@@ -234,7 +225,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             while ((tileStepX == 1 && (interceptX >> 8 < tileX)) ||
                    (tileStepX == -1 && (interceptX >> 8 >= tileX))) {
                 tileY += tileStepY;
-                if (RayCasterFixedIsWall(tileX, tileY)) {
+                if (MapIsWall(tileX, tileY)) {
                     goto HorizontalHit;
                 }
                 interceptX += stepX;

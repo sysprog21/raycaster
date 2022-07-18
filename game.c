@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "raycaster.h"
+#include "raycaster_data.h"
 #include "raycaster_tables.h"
 
 Game GameConstruct(void)
@@ -45,12 +46,18 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
         cosine += LOOKUP8(g_cos, INVERT(angle));
         break;
     }
-    game->playerX += (m * (sine > 0 ? 1 : -1) *
-                      UMULT(sine > 0 ? sine : -sine, seconds) * 5) >>
-                     1;
-    game->playerY += (m * (cosine > 0 ? 1 : -1) *
-                      UMULT(cosine > 0 ? cosine : -cosine, seconds) * 5) >>
-                     1;
+    uint16_t newX =
+        game->playerX + ((m * (sine > 0 ? 1 : -1) *
+                          UMULT(sine > 0 ? sine : -sine, seconds) * 5) >>
+                         1);
+    uint16_t newY =
+        game->playerY + ((m * (cosine > 0 ? 1 : -1) *
+                          UMULT(cosine > 0 ? cosine : -cosine, seconds) * 5) >>
+                         1);
+    if (!MapIsWall(newX >> 8, newY >> 8)) {
+        game->playerX = newX;
+        game->playerY = newY;
+    }
 
     if (game->playerX < 256) {
         game->playerX = 258;
