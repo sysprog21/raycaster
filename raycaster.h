@@ -25,25 +25,23 @@
 #define ABS(x) (x < 0 ? -x : x)
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define RayCaster struct RayCaster_
-
-struct RayCaster_ {
+typedef struct RayCaster {
     void *derived;
 
-    void (*Destruct)(RayCaster *rayCaster);
+    void (*Destruct)(struct RayCaster *rayCaster);
 
-    void (*Start)(RayCaster *rayCaster,
+    void (*Start)(struct RayCaster *rayCaster,
                   uint16_t playerX,
                   uint16_t playerY,
                   int16_t playerA);
-    void (*Trace)(RayCaster *rayCaster,
+    void (*Trace)(struct RayCaster *rayCaster,
                   uint16_t screenX,
                   uint8_t *screenY,
                   uint8_t *textureNo,
                   uint8_t *textureX,
                   uint16_t *textureY,
                   uint16_t *textureStep);
-};
+} RayCaster;
 
 RayCaster *RayCasterConstruct(void);
 
