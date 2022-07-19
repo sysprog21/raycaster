@@ -28,7 +28,6 @@ $(GIT_HOOKS):
 OBJS := \
 	boot.o \
 	main.o \
-	clock.o \
 	mmio_asm.o \
 	uart.o \
 	mem.o \
