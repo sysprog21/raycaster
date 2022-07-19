@@ -5,5 +5,3 @@ raycaster_tables.c
 
 kernel.elf
 precalculator
-
-.vscode
