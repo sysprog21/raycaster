@@ -57,6 +57,12 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
     if (!MapIsWall(newX >> 8, newY >> 8)) {
         game->playerX = newX;
         game->playerY = newY;
+    } else {
+        if (!MapIsWall(game->playerX >> 8, newY >> 8)) {
+            game->playerY = newY;
+        } else if (!MapIsWall(newX >> 8, game->playerY >> 8)) {
+            game->playerX = newX;
+        }
     }
 
     if (game->playerX < 256) {
