@@ -7,15 +7,13 @@
 #include "raycaster_data.h"
 #include "raycaster_tables.h"
 
-#define RayCasterFixed struct RayCasterFixed_
-
-struct RayCasterFixed_ {
+typedef struct RayCasterFixed {
     uint16_t playerX;
     uint16_t playerY;
     int16_t playerA;
     uint8_t viewQuarter;
     uint8_t viewAngle;
-};
+} RayCasterFixed;
 
 static void RayCasterFixedStart(RayCaster *rayCaster,
                                 uint16_t playerX,

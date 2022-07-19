@@ -3,38 +3,28 @@
 
 #include <stdint.h>
 
-#define FbScreenSize struct FbScreenSize_
-
-struct FbScreenSize_ {
+typedef struct FbScreenSize {
     uint32_t width;
     uint32_t height;
-} __attribute__((packed));
+} __attribute__((packed)) FbScreenSize;
 
-#define ClockRateSetInfo struct ClockRateSetInfo_
-
-struct ClockRateSetInfo_ {
+typedef struct ClockRateSetInfo {
     uint32_t clockId;
     uint32_t rate;
     uint32_t skipTurbo;
-} __attribute__((packed));
+} __attribute__((packed)) ClockRateSetInfo;
 
-#define FbAllocateRes struct FbAllocateRes_
-
-struct FbAllocateRes_ {
+typedef struct FbAllocateRes {
     uint32_t base;
     uint32_t size;
-} __attribute__((packed));
+} __attribute__((packed)) FbAllocateRes;
 
-#define ClockRateRes struct ClockRateRes_
-
-struct ClockRateRes_ {
+typedef struct ClockRateRes {
     uint32_t clockId;
     uint32_t rate;
-} __attribute__((packed));
+} __attribute__((packed)) ClockRateRes;
 
-#define ValueBuffer union ValueBuffer_
-
-union ValueBuffer_ {
+typedef union ValueBuffer {
     FbScreenSize fbScreenSize;
     uint32_t fbBitsPerPixel;
     uint32_t fbAllocateAlignment;
@@ -43,7 +33,7 @@ union ValueBuffer_ {
 
     FbAllocateRes fbAllocateRes;
     ClockRateRes clockRateRes;
-};
+} ValueBuffer;
 
 #define NULL_TAG 0
 #define FB_ALLOCATE_TAG 0x00040001
@@ -53,12 +43,10 @@ union ValueBuffer_ {
 #define CLOCK_GET_MAX_RATE 0x00030004
 #define CLOCK_SET_RATE 0x00038002
 
-#define PropertyMessageTag struct PropertyMessageTag_
-
-struct PropertyMessageTag_ {
+typedef struct PropertyMessageTag {
     uint32_t tag;
     ValueBuffer value;
-} __attribute__((packed));
+} __attribute__((packed)) PropertyMessageTag;
 
 uint32_t mailbox_read(uint8_t channel);
 

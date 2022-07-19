@@ -5,14 +5,12 @@
 
 #define HEAP_SIZE 1024 * 1024
 
-#define HeapSegmentHeader struct HeapSegmentHeader_
-
-struct HeapSegmentHeader_ {
+typedef struct HeapSegmentHeader {
     uint32_t allocated;
     uint32_t size;
-    HeapSegmentHeader *prev;
-    HeapSegmentHeader *next;
-} __attribute__((packed));
+    struct HeapSegmentHeader *prev;
+    struct HeapSegmentHeader *next;
+} __attribute__((packed)) HeapSegmentHeader;
 
 extern uint8_t __end;
 

@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "clock.h"
 #include "fb.h"
 #include "game.h"
 #include "mem.h"
@@ -28,10 +27,6 @@ void CopyBuffer(uint32_t *fb, uint32_t *buffer)
 
 void kmain()
 {
-    if (clock_set_max_rate() != 0) {
-        uart_puts("Failed to set max clock rate!\n");
-    }
-
     uint32_t *buffer = kmalloc(SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
     RayCaster *rayCaster = RayCasterFixedConstruct();
     Game game = GameConstruct();

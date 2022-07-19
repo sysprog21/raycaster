@@ -19,13 +19,11 @@
 #define MESSAGE_CODE_RESPONSE_SUCCESS 0x80000000
 #define MESSAGE_CODE_RESPONSE_ERROR 0x80000001
 
-#define PropertyMessageBuffer struct PropertyMessageBuffer_
-
-struct PropertyMessageBuffer_ {
+typedef struct PropertyMessageBuffer {
     uint32_t size;
     uint32_t code;
     uint32_t tags[1];
-} __attribute__((packed));
+} __attribute__((packed)) PropertyMessageBuffer;
 
 uint32_t mailbox_read(uint8_t channel)
 {
