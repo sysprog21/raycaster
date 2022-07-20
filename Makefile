@@ -49,6 +49,7 @@ precalculator: tools/precalculator.cpp
 	$(Q)$(CXX) -o $@ $(CXXFLAGS) -I . $<
 
 raycaster_tables.c: precalculator
+	$(VECHO) "  Precompute\t$@\n"
 	./precalculator > $@
 
 %.o: %.c
