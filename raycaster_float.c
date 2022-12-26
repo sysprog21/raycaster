@@ -18,20 +18,57 @@
 
 #include "raycaster_float.h"
 #include <math.h>
-#include <algorithm>
+#include <stdlib.h>
 
 #define P2P_DISTANCE(x1, y1, x2, y2)              \
     sqrt((float) (((x1) - (x2)) * ((x1) - (x2)) + \
                   ((y1) - (y2)) * ((y1) - (y2))))
 
-bool RayCasterFloat::IsWall(float rayX, float rayY)
+typedef struct {
+    float playerX;
+    float playerY;
+    float playerA;
+} RayCasterFloat;
+
+static void RayCasterFloatTrace(RayCaster *rayCaster,
+                                uint16_t screenX,
+                                uint8_t *screenY,
+                                uint8_t *textureNo,
+                                uint8_t *textureX,
+                                uint16_t *textureY,
+                                uint16_t *textureStep);
+static void RayCasterFloatStart(RayCaster *rayCaster,
+                                uint16_t playerX,
+                                uint16_t playerY,
+                                int16_t playerA);
+static void RayCasterFloatDestruct(RayCaster *rayCaster);
+
+RayCaster *RayCasterFloatConstruct(void)
+{
+    RayCaster *rayCaster = RayCasterConstruct();
+    RayCasterFloat *rayCasterFloat = malloc(sizeof(RayCasterFloat));
+
+    if (!rayCasterFloat) {
+        rayCaster->Destruct(rayCaster);
+        return NULL;
+    }
+    rayCaster->derived = rayCasterFloat;
+
+    rayCaster->Start = RayCasterFloatStart;
+    rayCaster->Trace = RayCasterFloatTrace;
+    rayCaster->Destruct = RayCasterFloatDestruct;
+
+    return rayCaster;
+}
+
+static bool RayCasterFloatIsWall(float rayX, float rayY)
 {
     float mapX = 0;
     float mapY = 0;
     modff(rayX, &mapX);
     modff(rayY, &mapY);
-    int tileX = static_cast<int>(mapX);
-    int tileY = static_cast<int>(mapY);
+    int tileX = (int) mapX;
+    int tileY = (int) mapY;
 
     if (tileX < 0 || tileY < 0 || tileX >= MAP_X - 1 || tileY >= MAP_Y - 1) {
         return true;
@@ -40,11 +77,11 @@ bool RayCasterFloat::IsWall(float rayX, float rayY)
            (1 << (8 - (tileX & 0x7)));
 }
 
-float RayCasterFloat::Distance(float playerX,
-                               float playerY,
-                               float rayA,
-                               float *hitOffset,
-                               int *hitDirection)
+static float RayCasterFloatDistance(float playerX,
+                                    float playerY,
+                                    float rayA,
+                                    float *hitOffset,
+                                    int *hitDirection)
 {
     while (rayA < 0) {
         rayA += 2.0f * M_PI;
@@ -65,12 +102,12 @@ float RayCasterFloat::Distance(float playerX,
     depth = 0;
     vertHitDis = 0;
     if (sin(rayA) > 0.001) {  // rayA pointing rightward
-        rayX = static_cast<int>(playerX) + 1;
+        rayX = (int) playerX + 1;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = 1;
         yOffset = xOffset * cotA;
     } else if (sin(rayA) < -0.001) {  // rayA pointing leftward
-        rayX = static_cast<int>(playerX) - 0.001;
+        rayX = (int) playerX - 0.001;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = -1;
         yOffset = xOffset * cotA;
@@ -83,7 +120,7 @@ float RayCasterFloat::Distance(float playerX,
     }
 
     while (depth < maxDepth) {
-        if (IsWall(rayX, rayY)) {
+        if (RayCasterFloatIsWall(rayX, rayY)) {
             vertHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
             break;
         } else {
@@ -99,12 +136,12 @@ float RayCasterFloat::Distance(float playerX,
     depth = 0;
     horiHitDis = 0;
     if (cos(rayA) > 0.001) {  // rayA pointing upward
-        rayY = static_cast<int>(playerY) + 1;
+        rayY = (int) playerY + 1;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = 1;
         xOffset = yOffset * tanA;
     } else if (cos(rayA) < -0.001) {  // rayA pointing downward
-        rayY = static_cast<int>(playerY) - 0.001;
+        rayY = (int) playerY - 0.001;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = -1;
         xOffset = yOffset * tanA;
@@ -117,7 +154,7 @@ float RayCasterFloat::Distance(float playerX,
     }
 
     while (depth < maxDepth) {
-        if (IsWall(rayX, rayY)) {
+        if (RayCasterFloatIsWall(rayX, rayY)) {
             horiHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
             break;
         } else {
@@ -137,22 +174,26 @@ float RayCasterFloat::Distance(float playerX,
         *hitOffset = rayX;
     }
 
-    return std::min(vertHitDis, horiHitDis);
+    return fmin(vertHitDis, horiHitDis);
 }
 
-void RayCasterFloat::Trace(uint16_t screenX,
-                           uint8_t *screenY,
-                           uint8_t *textureNo,
-                           uint8_t *textureX,
-                           uint16_t *textureY,
-                           uint16_t *textureStep)
+static void RayCasterFloatTrace(RayCaster *rayCaster,
+                                uint16_t screenX,
+                                uint8_t *screenY,
+                                uint8_t *textureNo,
+                                uint8_t *textureX,
+                                uint16_t *textureY,
+                                uint16_t *textureStep)
 {
     float hitOffset;
     int hitDirection;
     float deltaAngle = atanf(((int16_t) screenX - SCREEN_WIDTH / 2.0f) /
                              (SCREEN_WIDTH / 2.0f) * M_PI / 4);
-    float lineDistance = Distance(_playerX, _playerY, _playerA + deltaAngle,
-                                  &hitOffset, &hitDirection);
+    float lineDistance = RayCasterFloatDistance(
+        ((RayCasterFloat *) (rayCaster->derived))->playerX,
+        ((RayCasterFloat *) (rayCaster->derived))->playerY,
+        ((RayCasterFloat *) (rayCaster->derived))->playerA + deltaAngle,
+        &hitOffset, &hitDirection);
     float distance = lineDistance * cos(deltaAngle);
     float dum;
     *textureX = (uint8_t) (256.0f * modff(hitOffset, &dum));
@@ -162,11 +203,11 @@ void RayCasterFloat::Trace(uint16_t screenX,
     if (distance > 0) {
         float tmp = INV_FACTOR / distance;
         *screenY = tmp;
-        auto txs = (tmp * 2.0f);
+        float txs = (tmp * 2.0f);
         if (txs != 0) {
             *textureStep = (256 / txs) * 256;
             if (txs > SCREEN_HEIGHT) {
-                auto wallHeight = (txs - SCREEN_HEIGHT) / 2;
+                float wallHeight = (txs - SCREEN_HEIGHT) / 2;
                 *textureY = wallHeight * (256 / txs) * 256;
                 *screenY = HORIZON_HEIGHT;
             }
@@ -176,13 +217,21 @@ void RayCasterFloat::Trace(uint16_t screenX,
     }
 }
 
-void RayCasterFloat::Start(uint16_t playerX, uint16_t playerY, int16_t playerA)
+static void RayCasterFloatStart(RayCaster *rayCaster,
+                                uint16_t playerX,
+                                uint16_t playerY,
+                                int16_t playerA)
 {
-    _playerX = (playerX / 1024.0f) * 4.0f;
-    _playerY = (playerY / 1024.0f) * 4.0f;
-    _playerA = (playerA / 1024.0f) * 2.0f * M_PI;
+    ((RayCasterFloat *) (rayCaster->derived))->playerX =
+        (playerX / 1024.0f) * 4.0f;
+    ((RayCasterFloat *) (rayCaster->derived))->playerY =
+        (playerY / 1024.0f) * 4.0f;
+    ((RayCasterFloat *) (rayCaster->derived))->playerA =
+        (playerA / 1024.0f) * 2.0f * M_PI;
 }
 
-RayCasterFloat::RayCasterFloat() : RayCaster() {}
-
-RayCasterFloat::~RayCasterFloat() {}
+static void RayCasterFloatDestruct(RayCaster *rayCaster)
+{
+    free(rayCaster->derived);
+    RayCasterDestruct(rayCaster);
+}
