@@ -46,33 +46,66 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
         cosine += LOOKUP8(g_cos, INVERT(angle));
         break;
     }
-    uint16_t newX =
-        game->playerX + ((m * (sine > 0 ? 1 : -1) *
-                          UMULT(sine > 0 ? sine : -sine, seconds) * 5) >>
-                         1);
-    uint16_t newY =
-        game->playerY + ((m * (cosine > 0 ? 1 : -1) *
-                          UMULT(cosine > 0 ? cosine : -cosine, seconds) * 5) >>
-                         1);
-    if (!MapIsWall(newX >> 8, newY >> 8)) {
-        game->playerX = newX;
-        game->playerY = newY;
-    } else {
-        if (!MapIsWall(game->playerX >> 8, newY >> 8)) {
-            game->playerY = newY;
-        } else if (!MapIsWall(newX >> 8, game->playerY >> 8)) {
-            game->playerX = newX;
+    /* Use int32_t to prevent overflow: UMULT can be up to 65535, *5>>1 ~163k */
+    int32_t dx = ((int32_t) m * (sine > 0 ? 1 : -1) *
+                  UMULT(sine > 0 ? sine : -sine, seconds) * 5) >>
+                 1;
+    int32_t dy = ((int32_t) m * (cosine > 0 ? 1 : -1) *
+                  UMULT(cosine > 0 ? cosine : -cosine, seconds) * 5) >>
+                 1;
+
+    /* Boundary constants */
+    const int32_t minBound = 256 + PLAYER_RADIUS;
+    const int32_t maxBoundX = ((MAP_X - 2) << 8) - PLAYER_RADIUS;
+    const int32_t maxBoundY = ((MAP_Y - 2) << 8) - PLAYER_RADIUS;
+
+    /* Check X movement with player radius (use int32_t to prevent underflow) */
+    int32_t newX = (int32_t) game->playerX + dx;
+    if (newX < minBound)
+        newX = minBound;
+    else if (newX > maxBoundX)
+        newX = maxBoundX;
+
+    if (dx != 0) {
+        int32_t checkX =
+            (dx >= 0) ? (newX + PLAYER_RADIUS) : (newX - PLAYER_RADIUS);
+        int32_t checkYhi = (int32_t) game->playerY + PLAYER_RADIUS;
+        int32_t checkYlo = (int32_t) game->playerY - PLAYER_RADIUS;
+        if (checkYlo < 0)
+            checkYlo = 0;
+        if (!MapIsWall(checkX >> 8, checkYhi >> 8) &&
+            !MapIsWall(checkX >> 8, checkYlo >> 8)) {
+            game->playerX = (uint16_t) newX;
         }
     }
 
-    if (game->playerX < 256) {
-        game->playerX = 258;
-    } else if (game->playerX > (MAP_X - 2) << 8) {
-        game->playerX = ((MAP_X - 2) << 8) - 2;
+    /* Check Y movement with player radius (use int32_t to prevent underflow) */
+    int32_t newY = (int32_t) game->playerY + dy;
+    if (newY < minBound)
+        newY = minBound;
+    else if (newY > maxBoundY)
+        newY = maxBoundY;
+
+    if (dy != 0) {
+        int32_t checkY =
+            (dy >= 0) ? (newY + PLAYER_RADIUS) : (newY - PLAYER_RADIUS);
+        int32_t checkXhi = (int32_t) game->playerX + PLAYER_RADIUS;
+        int32_t checkXlo = (int32_t) game->playerX - PLAYER_RADIUS;
+        if (checkXlo < 0)
+            checkXlo = 0;
+        if (!MapIsWall(checkXhi >> 8, checkY >> 8) &&
+            !MapIsWall(checkXlo >> 8, checkY >> 8)) {
+            game->playerY = (uint16_t) newY;
+        }
     }
-    if (game->playerY < 256) {
-        game->playerY = 258;
-    } else if (game->playerY > (MAP_Y - 2) << 8) {
-        game->playerY = ((MAP_Y - 2) << 8) - 2;
-    }
+
+    /* Final boundary clamp (safety net) */
+    if (game->playerX < minBound)
+        game->playerX = minBound;
+    else if (game->playerX > maxBoundX)
+        game->playerX = maxBoundX;
+    if (game->playerY < minBound)
+        game->playerY = minBound;
+    else if (game->playerY > maxBoundY)
+        game->playerY = maxBoundY;
 }
