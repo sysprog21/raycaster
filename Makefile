@@ -1,12 +1,10 @@
-BIN = raycaster_sdl raycaster_baremetal.elf precalculator
-
 CXXFLAGS = -std=c++11 -O2 -Wall -g
 CFLAGS = `sdl2-config --cflags`
 LDFLAGS = `sdl2-config --libs` -lm
 
-CROSS ?= arm-none-eabi-
-BAREMETAL_CC = $(CROSS)gcc
-BAREMETAL_AS = $(CROSS)as
+CROSS_COMPILE ?= arm-none-eabi-
+BAREMETAL_CC = $(CROSS_COMPILE)gcc
+BAREMETAL_AS = $(CROSS_COMPILE)as
 BAREMETAL_CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding -std=gnu11 -O2 -Wall -Wextra
 BAREMETAL_LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
 
@@ -20,9 +18,11 @@ else
 endif
 
 GIT_HOOKS := .git/hooks/applied
-.PHONY: all clean
+.PHONY: all clean sdl arm baremetal
 
-all: $(GIT_HOOKS) $(BIN)
+all: $(GIT_HOOKS) raycaster_sdl
+
+arm: $(GIT_HOOKS) raycaster_baremetal.elf
 
 $(GIT_HOOKS):
 	@scripts/install-git-hooks
@@ -94,4 +94,5 @@ baremetal: raycaster_baremetal.elf
 	qemu-system-arm -M raspi0 -kernel raycaster_baremetal.elf -serial stdio
 
 clean:
-	$(RM) $(BIN) $(ARM_OBJS) $(SDL_OBJS) $(BAREMETAL_OBJS) raycaster_tables.c
+	$(RM) raycaster_sdl raycaster_baremetal.elf precalculator
+	$(RM) $(ARM_OBJS) $(SDL_OBJS) $(BAREMETAL_OBJS) raycaster_tables.c

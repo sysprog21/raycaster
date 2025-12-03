@@ -30,11 +30,22 @@ void copy_buffer(uint32_t *fb, uint32_t *buffer)
 void main()
 {
     uint32_t *buffer = malloc(SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(uint32_t));
+    if (!buffer)
+        return;
     RayCaster *rayCaster = RayCasterFixedConstruct();
+    if (!rayCaster) {
+        free(buffer);
+        return;
+    }
     Game game = GameConstruct();
     Renderer renderer = RendererConstruct(rayCaster);
 
     uint32_t *fb = fb_create(FB_WIDTH, FB_HEIGHT, 32);
+    if (!fb) {
+        rayCaster->Destruct(rayCaster);
+        free(buffer);
+        return;
+    }
     uint64_t tickCounter = timer_clock(), elapsed = 0;
     int frameCounter = 0, frameRate = 0;
     for (;;) {

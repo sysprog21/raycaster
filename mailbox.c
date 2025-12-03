@@ -71,6 +71,8 @@ int mailbox_send_messages(PropertyMessageTag *tags)
     size += size % 16 ? 16 - (size % 16) : 0;
 
     PropertyMessageBuffer *buffer = malloc(size);
+    if (!buffer)
+        return -1;
     buffer->code = MESSAGE_CODE_REQUEST;
     buffer->size = size;
     for (int i = 0; tags[i].tag != NULL_TAG; ++i) {

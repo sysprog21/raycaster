@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CPPCHECK_OPTS="-I. -I./include --error-exitcode=1 ."
+CPPCHECK_OPTS="-I. -I./include --error-exitcode=1 --suppress=normalCheckLevelMaxBranches ."
 
 RETURN=0
 CLANG_FORMAT=$(which clang-format)
