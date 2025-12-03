@@ -8,3 +8,5 @@ raycaster_tables.c
 # Binaries
 kernel.elf
 precalculator
+baremetal
+raycaster_sdl

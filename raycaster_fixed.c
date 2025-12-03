@@ -254,11 +254,12 @@ static void RayCasterFixedStart(RayCaster *rayCaster,
                                 uint16_t playerY,
                                 int16_t playerA)
 {
-    ((RayCasterFixed *) (rayCaster->derived))->viewQuarter = playerA >> 8;
-    ((RayCasterFixed *) (rayCaster->derived))->viewAngle = playerA % 256;
-    ((RayCasterFixed *) (rayCaster->derived))->playerX = playerX;
-    ((RayCasterFixed *) (rayCaster->derived))->playerY = playerY;
-    ((RayCasterFixed *) (rayCaster->derived))->playerA = playerA;
+    RayCasterFixed *self = rayCaster->derived;
+    self->viewQuarter = playerA >> 8;
+    self->viewAngle = playerA % 256;
+    self->playerX = playerX;
+    self->playerY = playerY;
+    self->playerA = playerA;
 }
 
 // (playerX, playerY) is 8 box coordinate bits, 8 inside coordinate bits
@@ -271,9 +272,9 @@ static void RayCasterFixedTrace(RayCaster *rayCaster,
                                 uint16_t *textureY,
                                 uint16_t *textureStep)
 {
+    RayCasterFixed *self = rayCaster->derived;
     uint16_t rayAngle =
-        (uint16_t) (((RayCasterFixed *) (rayCaster->derived))->playerA +
-                    LOOKUP16(g_deltaAngle, screenX));
+        (uint16_t) (self->playerA + LOOKUP16(g_deltaAngle, screenX));
 
     // neutralize artefacts around edges
     switch (rayAngle % 256) {
@@ -290,76 +291,61 @@ static void RayCasterFixedTrace(RayCaster *rayCaster,
 
     int16_t deltaX;
     int16_t deltaY;
-    RayCasterFixedCalculateDistance(
-        ((RayCasterFixed *) (rayCaster->derived))->playerX,
-        ((RayCasterFixed *) (rayCaster->derived))->playerY, rayAngle, &deltaX,
-        &deltaY, textureNo, textureX);
+    RayCasterFixedCalculateDistance(self->playerX, self->playerY, rayAngle,
+                                    &deltaX, &deltaY, textureNo, textureX);
 
     // distance = deltaY * cos(playerA) + deltaX * sin(playerA)
     int16_t distance = 0;
-    if (((RayCasterFixed *) (rayCaster->derived))->playerA == 0) {
+    if (self->playerA == 0) {
         distance += deltaY;
-    } else if (((RayCasterFixed *) (rayCaster->derived))->playerA == 512) {
+    } else if (self->playerA == 512) {
         distance -= deltaY;
-    } else
-        switch (((RayCasterFixed *) (rayCaster->derived))->viewQuarter) {
+    } else {
+        switch (self->viewQuarter) {
         case 0:
-            distance += RayCasterFixedMulS(
-                LOOKUP8(g_cos,
-                        ((RayCasterFixed *) (rayCaster->derived))->viewAngle),
-                deltaY);
+            distance +=
+                RayCasterFixedMulS(LOOKUP8(g_cos, self->viewAngle), deltaY);
             break;
         case 1:
             distance -= RayCasterFixedMulS(
-                LOOKUP8(g_cos, INVERT(((RayCasterFixed *) (rayCaster->derived))
-                                          ->viewAngle)),
-                deltaY);
+                LOOKUP8(g_cos, INVERT(self->viewAngle)), deltaY);
             break;
         case 2:
-            distance -= RayCasterFixedMulS(
-                LOOKUP8(g_cos,
-                        ((RayCasterFixed *) (rayCaster->derived))->viewAngle),
-                deltaY);
+            distance -=
+                RayCasterFixedMulS(LOOKUP8(g_cos, self->viewAngle), deltaY);
             break;
         case 3:
             distance += RayCasterFixedMulS(
-                LOOKUP8(g_cos, INVERT(((RayCasterFixed *) (rayCaster->derived))
-                                          ->viewAngle)),
-                deltaY);
+                LOOKUP8(g_cos, INVERT(self->viewAngle)), deltaY);
             break;
         }
+    }
 
-    if (((RayCasterFixed *) (rayCaster->derived))->playerA == 256) {
+    if (self->playerA == 256) {
         distance += deltaX;
-    } else if (((RayCasterFixed *) (rayCaster->derived))->playerA == 768) {
+    } else if (self->playerA == 768) {
         distance -= deltaX;
-    } else
-        switch (((RayCasterFixed *) (rayCaster->derived))->viewQuarter) {
+    } else {
+        switch (self->viewQuarter) {
         case 0:
-            distance += RayCasterFixedMulS(
-                LOOKUP8(g_sin,
-                        ((RayCasterFixed *) (rayCaster->derived))->viewAngle),
-                deltaX);
+            distance +=
+                RayCasterFixedMulS(LOOKUP8(g_sin, self->viewAngle), deltaX);
             break;
         case 1:
             distance += RayCasterFixedMulS(
-                LOOKUP8(g_sin, INVERT(((RayCasterFixed *) (rayCaster->derived))
-                                          ->viewAngle)),
-                deltaX);
+                LOOKUP8(g_sin, INVERT(self->viewAngle)), deltaX);
             break;
         case 2:
-            distance -= RayCasterFixedMulS(
-                LOOKUP8(g_sin,
-                        ((RayCasterFixed *) (rayCaster->derived))->viewAngle),
-                deltaX);
+            distance -=
+                RayCasterFixedMulS(LOOKUP8(g_sin, self->viewAngle), deltaX);
             break;
         case 3:
             distance -= RayCasterFixedMulS(
-                LOOKUP8(g_sin, INVERT(((RayCasterFixed *) (rayCaster->derived))
-                                          ->viewAngle)),
-                deltaX);
+                LOOKUP8(g_sin, INVERT(self->viewAngle)), deltaX);
             break;
         }
+    }
+
     if (distance >= MIN_DIST) {
         *textureY = 0;
         RayCasterFixedLookupHeight((distance - MIN_DIST) >> 2, screenY,
