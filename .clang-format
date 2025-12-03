@@ -13,3 +13,12 @@ UseTab: Never
 IndentWidth: 4
 BreakBeforeBraces: Linux
 AccessModifierOffset: -4
+AttributeMacros:
+  - UNUSED
+  - __ALIGNED
+  - PACKED
+  - FORCE_INLINE
+StatementAttributeLikeMacros:
+  - IIF
+StatementMacros:
+  - __UNREACHABLE
