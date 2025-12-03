@@ -66,7 +66,54 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
     else if (newX > maxBoundX)
         newX = maxBoundX;
 
-    if (dx != 0) {
+    /* Check Y movement with player radius (use int32_t to prevent underflow) */
+    int32_t newY = (int32_t) game->playerY + dy;
+    if (newY < minBound)
+        newY = minBound;
+    else if (newY > maxBoundY)
+        newY = maxBoundY;
+
+    /* Diagonal corner check: prevent tunneling through wall corners */
+    int canMoveX = 1, canMoveY = 1;
+    if (dx != 0 && dy != 0) {
+        int32_t diagX =
+            (dx >= 0) ? (newX + PLAYER_RADIUS) : (newX - PLAYER_RADIUS);
+        int32_t diagY =
+            (dy >= 0) ? (newY + PLAYER_RADIUS) : (newY - PLAYER_RADIUS);
+        int diagTileX = diagX >> 8;
+        int diagTileY = diagY >> 8;
+
+        if (MapIsWall(diagTileX, diagTileY)) {
+            /* Corner is blocked - check which axis is the actual obstacle */
+            int32_t curXedge = (dx >= 0) ? (game->playerX + PLAYER_RADIUS)
+                                         : (game->playerX - PLAYER_RADIUS);
+            int32_t curYedge = (dy >= 0) ? (game->playerY + PLAYER_RADIUS)
+                                         : (game->playerY - PLAYER_RADIUS);
+            int curTileX = curXedge >> 8;
+            int curTileY = curYedge >> 8;
+
+            /* If moving X with current Y hits wall, block X */
+            if (MapIsWall(diagTileX, curTileY))
+                canMoveX = 0;
+            /* If moving Y with current X hits wall, block Y */
+            if (MapIsWall(curTileX, diagTileY))
+                canMoveY = 0;
+            /* If neither axis alone is blocked, slide along closer surface */
+            if (canMoveX && canMoveY) {
+                /* Compare clearance to wall on each axis */
+                int32_t clearX = (dx >= 0) ? ((diagTileX << 8) - newX)
+                                           : (newX - ((diagTileX + 1) << 8));
+                int32_t clearY = (dy >= 0) ? ((diagTileY << 8) - newY)
+                                           : (newY - ((diagTileY + 1) << 8));
+                if (clearX <= clearY)
+                    canMoveX = 0;
+                else
+                    canMoveY = 0;
+            }
+        }
+    }
+
+    if (dx != 0 && canMoveX) {
         int32_t checkX =
             (dx >= 0) ? (newX + PLAYER_RADIUS) : (newX - PLAYER_RADIUS);
         int32_t checkYhi = (int32_t) game->playerY + PLAYER_RADIUS;
@@ -79,14 +126,7 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
         }
     }
 
-    /* Check Y movement with player radius (use int32_t to prevent underflow) */
-    int32_t newY = (int32_t) game->playerY + dy;
-    if (newY < minBound)
-        newY = minBound;
-    else if (newY > maxBoundY)
-        newY = maxBoundY;
-
-    if (dy != 0) {
+    if (dy != 0 && canMoveY) {
         int32_t checkY =
             (dy >= 0) ? (newY + PLAYER_RADIUS) : (newY - PLAYER_RADIUS);
         int32_t checkXhi = (int32_t) game->playerX + PLAYER_RADIUS;
