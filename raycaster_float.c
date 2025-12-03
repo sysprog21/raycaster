@@ -62,20 +62,15 @@ RayCaster *RayCasterFloatConstruct(void)
     return rayCaster;
 }
 
+/* Wrapper to use shared MapIsWall with float coordinates */
 static bool RayCasterFloatIsWall(float rayX, float rayY)
 {
-    float mapX = 0;
-    float mapY = 0;
-    modff(rayX, &mapX);
-    modff(rayY, &mapY);
-    int tileX = (int) mapX;
-    int tileY = (int) mapY;
-
-    if (tileX < 0 || tileY < 0 || tileX >= MAP_X - 1 || tileY >= MAP_Y - 1) {
+    int tileX = (int) rayX;
+    int tileY = (int) rayY;
+    /* Bounds check before uint8_t cast to prevent wrap-around */
+    if (tileX < 0 || tileY < 0 || tileX >= MAP_X - 1 || tileY >= MAP_Y - 1)
         return true;
-    }
-    return g_map[(tileX >> 3) + (tileY << (MAP_XS - 3))] &
-           (1 << (8 - (tileX & 0x7)));
+    return MapIsWall((uint8_t) tileX, (uint8_t) tileY);
 }
 
 static float RayCasterFloatDistance(float playerX,
