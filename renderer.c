@@ -9,11 +9,21 @@
      ((uint8_t) UMULT(scalar, (rgba >> 8) & 0xFF) << 8) |   \
      ((uint8_t) UMULT(scalar, (rgba >> 0) & 0xFF) << 0))
 
-#define ADD_RGBA(rgba1, rgba2)                                     \
-    ((((uint8_t) (rgba1 >> 24) + (uint8_t) (rgba2 >> 24)) << 24) | \
-     (((uint8_t) (rgba1 >> 16) + (uint8_t) (rgba2 >> 16)) << 16) | \
-     (((uint8_t) (rgba1 >> 8) + (uint8_t) (rgba2 >> 8)) << 8) |    \
-     (((uint8_t) (rgba1 >> 0) + (uint8_t) (rgba2 >> 0)) << 0))
+/* Branchless saturating add for packed RGBA (SWAR technique).
+ * Detects per-byte overflow and saturates to 0xFF without branches.
+ * Much faster than per-channel MIN in hot pixel loops.
+ */
+static inline uint32_t add_rgba(uint32_t a, uint32_t b)
+{
+    uint32_t sum = a + b;
+    /* Detect per-byte overflow: high bit set where carry occurred */
+    uint32_t carry = ((a & b) | ((a | b) & ~sum)) & 0x80808080u;
+    /* Expand overflow bits to 0x7F mask, then OR to saturate to 0xFF */
+    carry = (carry - (carry >> 7)) & 0x7F7F7F7Fu;
+    return sum | carry;
+}
+
+#define ADD_RGBA(a, b) add_rgba((a), (b))
 
 Renderer RendererConstruct(RayCaster *rc)
 {
