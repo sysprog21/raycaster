@@ -21,8 +21,8 @@
 #define INV_FACTOR_INT ((uint16_t) (SCREEN_WIDTH * 75))
 #define MIN_DIST (int) ((150 * ((float) SCREEN_WIDTH / (float) SCREEN_HEIGHT)))
 #define HORIZON_HEIGHT (SCREEN_HEIGHT >> 1)
-#define INVERT(x) (uint8_t)((x ^ 255) + 1)
-#define UMULT(x, y) (uint16_t)(((uint32_t) (x) * (uint32_t) (y)) >> 8)
+#define INVERT(x) (uint8_t) ((x ^ 255) + 1)
+#define UMULT(x, y) (uint16_t) (((uint32_t) (x) * (uint32_t) (y)) >> 8)
 #define ABS(x) (x < 0 ? -x : x)
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
