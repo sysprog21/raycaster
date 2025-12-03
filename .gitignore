@@ -7,6 +7,9 @@ raycaster_tables.c
 
 # Binaries
 kernel.elf
+raycaster_baremetal.elf
 precalculator
-baremetal
 raycaster_sdl
+
+# Misc
+*.dSYM

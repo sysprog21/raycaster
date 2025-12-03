@@ -5,8 +5,8 @@ LDFLAGS = `sdl2-config --libs` -lm
 CROSS_COMPILE ?= arm-none-eabi-
 BAREMETAL_CC = $(CROSS_COMPILE)gcc
 BAREMETAL_AS = $(CROSS_COMPILE)as
-BAREMETAL_CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding -std=gnu11 -O2 -Wall -Wextra
-BAREMETAL_LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib -lgcc
+BAREMETAL_CFLAGS = -mcpu=arm1176jzf-s -fpic -ffreestanding -std=gnu11 -O2 -Wall -Wextra -I. -Iplat
+BAREMETAL_LDFLAGS = -T plat/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 
 # Control the build verbosity
 ifeq ("$(VERBOSE)","1")
@@ -29,14 +29,14 @@ $(GIT_HOOKS):
 	@echo
 
 ARM_OBJS := \
-	main_baremetal.o \
-	uart.o \
-	mem.o \
-	string.o \
-	stdlib.o \
-	mailbox.o \
-	timer.o \
-	fb.o
+	plat/main_baremetal.o \
+	plat/uart.o \
+	plat/mem.o \
+	plat/string.o \
+	plat/stdlib.o \
+	plat/mailbox.o \
+	plat/timer.o \
+	plat/fb.o
 
 SDL_OBJS := \
 	main_sdl.o \
@@ -48,8 +48,8 @@ SDL_OBJS := \
 	renderer.o \
 	raycaster_tables.o
 BAREMETAL_OBJS := \
-	boot.o \
-	mmio_asm.o \
+	plat/boot.o \
+	plat/mmio_asm.o \
 	game_baremetal.o \
 	raycaster_baremetal.o \
 	raycaster_fixed_baremetal.o \
@@ -65,7 +65,7 @@ raycaster_tables.c: precalculator
 	$(VECHO) "  Precompute\t$@\n"
 	./precalculator > $@
 
-$(ARM_OBJS): %.o: %.c
+$(ARM_OBJS): plat/%.o: plat/%.c
 	$(VECHO) "  C\t$@\n"
 	$(Q)$(BAREMETAL_CC) -o $@ $(BAREMETAL_CFLAGS) -c $<
 
@@ -77,7 +77,7 @@ $(ARM_OBJS): %.o: %.c
 	$(VECHO) "  C\t$@\n"
 	$(Q)$(CC) -o $@ $(CFLAGS) -c $<
 
-%.o: %.S
+plat/%.o: plat/%.S
 	$(VECHO) "  ASM\t$@\n"
 	$(Q)$(BAREMETAL_AS) -o $@ $(BAREMETAL_ASFLAGS) $<
 
