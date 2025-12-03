@@ -90,6 +90,11 @@ int main(int argc, char *args[])
             Uint64 tickCounter = SDL_GetPerformanceCounter();
             SDL_Event event;
 
+            /* FPS calculation with averaging */
+            uint32_t fpsCounter = 0;
+            uint64_t fpsAccumulator = 0;
+            uint32_t displayFPS = 0;
+
             SDL_Renderer *sdlRenderer = SDL_CreateRenderer(
                 sdlWindow, -1,
                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -104,6 +109,10 @@ int main(int argc, char *args[])
                 RendererTraceFrame(&floatRenderer, &game, floatBuffer);
                 RendererTraceFrame(&fixedRenderer, &game, fixedBuffer);
 
+                /* Draw FPS on both buffers */
+                RendererDrawFPS(fixedBuffer, displayFPS);
+                RendererDrawFPS(floatBuffer, displayFPS);
+
                 draw_buffer(sdlRenderer, fixedTexture, fixedBuffer, 0);
                 draw_buffer(sdlRenderer, floatTexture, floatBuffer,
                             SCREEN_WIDTH + 1);
@@ -117,6 +126,17 @@ int main(int argc, char *args[])
                 const Uint64 nextCounter = SDL_GetPerformanceCounter();
                 const Uint64 ticks = nextCounter - tickCounter;
                 tickCounter = nextCounter;
+
+                /* Update FPS with averaging over 60 frames */
+                fpsAccumulator += ticks;
+                fpsCounter++;
+                if (fpsCounter >= 60) {
+                    displayFPS = (uint32_t) (tickFrequency * fpsCounter /
+                                             fpsAccumulator);
+                    fpsAccumulator = 0;
+                    fpsCounter = 0;
+                }
+
                 GameMove(&game, moveDirection, rotateDirection,
                          ticks / (SDL_GetPerformanceFrequency() >> 8));
             }

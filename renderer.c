@@ -3,6 +3,25 @@
 #include <stdlib.h>
 #include "raycaster_data.h"
 
+/* 3x5 pixel digit font (0-9), each digit packed into uint16_t (15 bits used) */
+static const uint16_t g_digitFont[10] = {
+    0x7B6F, /* 0: 111 101 101 101 111 */
+    0x2492, /* 1: 010 010 010 010 010 */
+    0x73E7, /* 2: 111 001 111 100 111 */
+    0x73CF, /* 3: 111 001 111 001 111 */
+    0x5BC9, /* 4: 101 101 111 001 001 */
+    0x79CF, /* 5: 111 100 111 001 111 */
+    0x79EF, /* 6: 111 100 111 101 111 */
+    0x7249, /* 7: 111 001 001 001 001 */
+    0x7BEF, /* 8: 111 101 111 101 111 */
+    0x7BCF, /* 9: 111 101 111 001 111 */
+};
+
+#define FPS_COLOR 0xFF00FF00  /* Green */
+#define FPS_SHADOW 0xFF000000 /* Black shadow */
+#define DIGIT_WIDTH 4         /* 3 pixels + 1 spacing */
+#define DIGIT_HEIGHT 5
+
 #define MULT_SCALAR_RGBA(scalar, rgba)                      \
     (((uint8_t) UMULT(scalar, (rgba >> 24) & 0xFF) << 24) | \
      ((uint8_t) UMULT(scalar, (rgba >> 16) & 0xFF) << 16) | \
@@ -88,5 +107,59 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
                                  0xFFFFFFFF));
             lb += SCREEN_WIDTH;
         }
+    }
+}
+
+/* Draw a single digit at (x, y) position */
+static void draw_digit(uint32_t *fb, int x, int y, int digit, uint32_t color)
+{
+    if (digit < 0 || digit > 9)
+        return;
+    uint16_t glyph = g_digitFont[digit];
+    for (int row = 0; row < DIGIT_HEIGHT; row++) {
+        for (int col = 0; col < 3; col++) {
+            int px = x + col;
+            int py = y + row;
+            if (px >= 0 && px < SCREEN_WIDTH && py >= 0 && py < SCREEN_HEIGHT) {
+                /* Bit index: row 0 is bits 14-12, row 1 is bits 11-9, etc. */
+                int bitIdx = (4 - row) * 3 + (2 - col);
+                if (glyph & (1 << bitIdx))
+                    fb[py * SCREEN_WIDTH + px] = color;
+            }
+        }
+    }
+}
+
+void RendererDrawFPS(uint32_t *fb, uint32_t fps)
+{
+    /* Position: top-right corner (DIGIT_WIDTH includes 1px spacing) */
+    int startX = SCREEN_WIDTH - 1;
+    int startY = 2;
+
+    /* Count digits to determine starting position */
+    uint32_t temp = fps;
+    int numDigits = 0;
+    do {
+        numDigits++;
+        temp /= 10;
+    } while (temp > 0);
+
+    /* Calculate left-most digit position */
+    startX -= numDigits * DIGIT_WIDTH;
+
+    /* Draw digits from left to right */
+    temp = fps;
+    int digits[10];
+    for (int i = numDigits - 1; i >= 0; i--) {
+        digits[i] = temp % 10;
+        temp /= 10;
+    }
+
+    for (int i = 0; i < numDigits; i++) {
+        int x = startX + i * DIGIT_WIDTH;
+        /* Draw shadow first (offset by 1 pixel) */
+        draw_digit(fb, x + 1, startY + 1, digits[i], FPS_SHADOW);
+        /* Draw digit */
+        draw_digit(fb, x, startY, digits[i], FPS_COLOR);
     }
 }

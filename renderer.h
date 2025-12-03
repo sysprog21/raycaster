@@ -12,3 +12,5 @@ Renderer RendererConstruct(RayCaster *rc);
 void RendererDestruct(Renderer *renderer);
 
 void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *frameBuffer);
+
+void RendererDrawFPS(uint32_t *frameBuffer, uint32_t fps);
