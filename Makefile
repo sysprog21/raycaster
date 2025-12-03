@@ -1,5 +1,5 @@
-CXXFLAGS = -std=c++11 -O2 -Wall -g
 CFLAGS = `sdl2-config --cflags`
+CFLAGS_NATIVE = -std=c99 -O2 -Wall -g
 LDFLAGS = `sdl2-config --libs` -lm
 
 CROSS_COMPILE ?= arm-none-eabi-
@@ -57,9 +57,9 @@ BAREMETAL_OBJS := \
 	renderer_baremetal.o \
 	raycaster_tables_baremetal.o
 
-precalculator: tools/precalculator.cpp
-	$(VECHO) "  CXX\t$@\n"
-	$(Q)$(CXX) -o $@ $(CXXFLAGS) -I . $<
+precalculator: tools/precalculator.c
+	$(VECHO) "  CC\t$@\n"
+	$(Q)$(CC) -o $@ $(CFLAGS_NATIVE) -I . $< -lm
 
 raycaster_tables.c: precalculator
 	$(VECHO) "  Precompute\t$@\n"
