@@ -88,8 +88,6 @@ static float RayCasterFloatDistance(float playerX,
 
     float sinA = sinf(rayA);
     float cosA = cosf(rayA);
-    float tanA = sinA / cosA;
-    float cotA = cosA / sinA;
     float rayX, rayY, vx, vy;
     float xOffset, yOffset, vertHitDis, horiHitDis;
     int depth = 0;
@@ -97,16 +95,20 @@ static float RayCasterFloatDistance(float playerX,
     const int maxDepth = MAP_X + MAP_Y;
     /* Initialize to large value so no-hit returns max distance */
     const float noHitDist = (float) (MAP_X + MAP_Y);
+    /* Epsilon for near-axis ray detection (avoids division by zero) */
+    const float slopeEps = 0.001f;
 
-    // Check for vertical hit
+    // Check for vertical hit (compute cotA only when needed)
     depth = 0;
     vertHitDis = noHitDist;
-    if (sinA > 0.001f) {  // rayA pointing rightward
+    if (sinA > slopeEps) {  // rayA pointing rightward
+        float cotA = cosA / sinA;
         rayX = (int) playerX + 1;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = 1;
         yOffset = xOffset * cotA;
-    } else if (sinA < -0.001f) {  // rayA pointing leftward
+    } else if (sinA < -slopeEps) {  // rayA pointing leftward
+        float cotA = cosA / sinA;
         rayX = (int) playerX - 0.001;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = -1;
@@ -132,15 +134,17 @@ static float RayCasterFloatDistance(float playerX,
     vx = rayX;
     vy = rayY;
 
-    // Check for horizontal hit
+    // Check for horizontal hit (compute tanA only when needed)
     depth = 0;
     horiHitDis = noHitDist;
-    if (cosA > 0.001f) {  // rayA pointing upward
+    if (cosA > slopeEps) {  // rayA pointing upward
+        float tanA = sinA / cosA;
         rayY = (int) playerY + 1;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = 1;
         xOffset = yOffset * tanA;
-    } else if (cosA < -0.001f) {  // rayA pointing downward
+    } else if (cosA < -slopeEps) {  // rayA pointing downward
+        float tanA = sinA / cosA;
         rayY = (int) playerY - 0.001;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = -1;
