@@ -41,8 +41,15 @@ static void dump_u16_table(const char *name, const uint16_t *t, int len)
 static void precalculate(void)
 {
     for (int i = 0; i < 256; i++) {
-        g_tan[i] = (uint16_t) (256.0f * tanf(i * (float) M_PI_2 / 256.0f));
-        g_cotan[i] = (uint16_t) (256.0f / tanf(i * (float) M_PI_2 / 256.0f));
+        float angle = i * (float) M_PI_2 / 256.0f;
+        float t = tanf(angle);
+        /* Clamp tan to avoid overflow when casting to uint16_t */
+        g_tan[i] = (uint16_t) fminf(256.0f * t, 65535.0f);
+        /* Avoid division by zero for cotan[0] and clamp result */
+        if (t < 0.004f) /* ~= 256/65535 */
+            g_cotan[i] = 65535;
+        else
+            g_cotan[i] = (uint16_t) fminf(256.0f / t, 65535.0f);
     }
 
     for (int i = 0; i < 256; i++) {

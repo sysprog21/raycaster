@@ -30,6 +30,8 @@ static void RayCasterFixedDestruct(RayCaster *rayCaster);
 RayCaster *RayCasterFixedConstruct(void)
 {
     RayCaster *rayCaster = RayCasterConstruct();
+    if (!rayCaster)
+        return NULL;
     RayCasterFixed *rayCasterFixed = malloc(sizeof(RayCasterFixed));
     if (!rayCasterFixed) {
         rayCaster->Destruct(rayCaster);
@@ -58,7 +60,7 @@ static int16_t RayCasterFixedMulS(uint8_t v, int16_t f)
 {
     const uint16_t uf = RayCasterFixedMulU(v, (uint16_t) ABS(f));
     if (f < 0) {
-        return ~uf;
+        return -(int16_t) uf;
     }
     return uf;
 }

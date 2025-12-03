@@ -54,8 +54,8 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
         }
 
         for (int y = 0; y < sso * 2; y++) {
-            // paint texture pixel
-            int ty = (int) (to >> 10);
+            // paint texture pixel (mask ty to 0-63 to prevent out-of-bounds)
+            int ty = (int) (to >> 10) & 63;
             uint32_t tv = g_texture32[(ty << 6) + tx];
 
             to += ts;

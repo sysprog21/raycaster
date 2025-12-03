@@ -46,8 +46,9 @@ static void RayCasterFloatDestruct(RayCaster *rayCaster);
 RayCaster *RayCasterFloatConstruct(void)
 {
     RayCaster *rayCaster = RayCasterConstruct();
+    if (!rayCaster)
+        return NULL;
     RayCasterFloat *rayCasterFloat = malloc(sizeof(RayCasterFloat));
-
     if (!rayCasterFloat) {
         rayCaster->Destruct(rayCaster);
         return NULL;
@@ -90,23 +91,27 @@ static float RayCasterFloatDistance(float playerX,
         rayA -= 2.0f * M_PI;
     }
 
-    float tanA = tan(rayA);
-    float cotA = 1 / tanA;
+    float sinA = sinf(rayA);
+    float cosA = cosf(rayA);
+    float tanA = sinA / cosA;
+    float cotA = cosA / sinA;
     float rayX, rayY, vx, vy;
     float xOffset, yOffset, vertHitDis, horiHitDis;
     int depth = 0;
-    const int maxDepth = 100;  // maxDepth is the maximum number of
-                               // attempt for a ray to find a wall.
+    /* Use map diagonal as max search depth */
+    const int maxDepth = MAP_X + MAP_Y;
+    /* Initialize to large value so no-hit returns max distance */
+    const float noHitDist = (float) (MAP_X + MAP_Y);
 
     // Check for vertical hit
     depth = 0;
-    vertHitDis = 0;
-    if (sin(rayA) > 0.001) {  // rayA pointing rightward
+    vertHitDis = noHitDist;
+    if (sinA > 0.001f) {  // rayA pointing rightward
         rayX = (int) playerX + 1;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = 1;
         yOffset = xOffset * cotA;
-    } else if (sin(rayA) < -0.001) {  // rayA pointing leftward
+    } else if (sinA < -0.001f) {  // rayA pointing leftward
         rayX = (int) playerX - 0.001;
         rayY = (rayX - playerX) * cotA + playerY;
         xOffset = -1;
@@ -134,13 +139,13 @@ static float RayCasterFloatDistance(float playerX,
 
     // Check for horizontal hit
     depth = 0;
-    horiHitDis = 0;
-    if (cos(rayA) > 0.001) {  // rayA pointing upward
+    horiHitDis = noHitDist;
+    if (cosA > 0.001f) {  // rayA pointing upward
         rayY = (int) playerY + 1;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = 1;
         xOffset = yOffset * tanA;
-    } else if (cos(rayA) < -0.001) {  // rayA pointing downward
+    } else if (cosA < -0.001f) {  // rayA pointing downward
         rayY = (int) playerY - 0.001;
         rayX = (rayY - playerY) * tanA + playerX;
         yOffset = -1;
