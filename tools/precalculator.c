@@ -4,6 +4,15 @@
 
 #include "raycaster.h"
 
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+#ifndef M_PI_2
+#define M_PI_2 1.57079632679489661923
+#endif
+
 static uint16_t g_tan[256];
 static uint16_t g_cotan[256];
 static uint8_t g_sin[256];
