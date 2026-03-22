@@ -1,0 +1,42 @@
+raycaster_float.c
+  0c442f9fbfd6e6ca 166-170
+renderer.c
+  0c442f9fbfd6e6ca 92-93
+raycaster_fixed.c
+  0c442f9fbfd6e6ca 30-31,272,279
+raycaster.h
+  0c442f9fbfd6e6ca 29-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "917adb633523591f912d0538350172de01cfb812",
+  "prompts": {
+    "0c442f9fbfd6e6ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6f301b7-3c0e-49e3-818f-83185dcddd3b",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Jim Huang <jserv@ccns.ncku.edu.tw>",
+      "messages": [],
+      "total_additions": 20,
+      "total_deletions": 8,
+      "accepted_lines": 20,
+      "overriden_lines": 0
+    },
+    "2fb52ded96409351": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fd4c9f4d-68ec-4030-8b60-35367b6f884f",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Jim Huang <jserv@ccns.ncku.edu.tw>",
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 79,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    }
+  }
+}
