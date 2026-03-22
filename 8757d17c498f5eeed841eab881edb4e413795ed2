@@ -1,0 +1,43 @@
+map_parser.c
+  3a48b12f4c36c990 1-442
+maps/maze.ray
+  3a48b12f4c36c990 1-21
+raycaster_float.c
+  3a48b12f4c36c990 126-127,140
+map_parser.h
+  3a48b12f4c36c990 1-48,50-55
+raycaster_data.h
+  3a48b12f4c36c990 13-14,22-63,65
+game.c
+  3a48b12f4c36c990 18-26,68-69
+game.h
+  3a48b12f4c36c990 13,16-17
+raycaster_fixed.c
+  3a48b12f4c36c990 177,187,200,248
+main_sdl.c
+  3a48b12f4c36c990 6,67-80
+Makefile
+  3a48b12f4c36c990 1,48
+maps/test.ray
+  3a48b12f4c36c990 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "8757d17c498f5eeed841eab881edb4e413795ed2",
+  "prompts": {
+    "3a48b12f4c36c990": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "64360bb0-276b-40f8-adbb-eb81daf8dc31",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Jim Huang <jserv@ccns.ncku.edu.tw>",
+      "messages": [],
+      "total_additions": 661,
+      "total_deletions": 53,
+      "accepted_lines": 617,
+      "overriden_lines": 1
+    }
+  }
+}
