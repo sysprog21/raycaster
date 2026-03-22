@@ -123,6 +123,8 @@ static void RayCasterFloatTrace(RayCaster *rayCaster,
     }
 
     // DDA: single loop, no trig inside
+    const int mapLimitX = MapWidth() - 1;
+    const int mapLimitY = MapHeight() - 1;
     int side;
     int hit = 0;
     while (!hit) {
@@ -135,7 +137,7 @@ static void RayCasterFloatTrace(RayCaster *rayCaster,
             mapY += stepY;
             side = 1;
         }
-        if (mapX < 0 || mapX >= MAP_X - 1 || mapY < 0 || mapY >= MAP_Y - 1)
+        if (mapX < 0 || mapX >= mapLimitX || mapY < 0 || mapY >= mapLimitY)
             hit = 1;
         else if (MapIsWall((uint8_t) mapX, (uint8_t) mapY))
             hit = 1;

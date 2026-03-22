@@ -15,6 +15,15 @@ Game GameConstruct(void)
     return game;
 }
 
+Game GameConstructAt(uint16_t x, uint16_t y, int16_t a)
+{
+    Game game;
+    game.playerX = x;
+    game.playerY = y;
+    game.playerA = a;
+    return game;
+}
+
 void GameMove(Game *game, int m, int r, uint16_t seconds)
 {
     game->playerA += r * UMULT(320, seconds);
@@ -56,8 +65,8 @@ void GameMove(Game *game, int m, int r, uint16_t seconds)
 
     /* Boundary constants */
     const int32_t minBound = 256 + PLAYER_RADIUS;
-    const int32_t maxBoundX = ((MAP_X - 2) << 8) - PLAYER_RADIUS;
-    const int32_t maxBoundY = ((MAP_Y - 2) << 8) - PLAYER_RADIUS;
+    const int32_t maxBoundX = ((MapWidth() - 2) << 8) - PLAYER_RADIUS;
+    const int32_t maxBoundY = ((MapHeight() - 2) << 8) - PLAYER_RADIUS;
 
     /* Check X movement with player radius (use int32_t to prevent underflow) */
     int32_t newX = (int32_t) game->playerX + dx;

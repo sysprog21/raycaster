@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "game.h"
+#include "map_parser.h"
 #include "raycaster.h"
 #include "raycaster_fixed.h"
 #include "raycaster_float.h"
@@ -63,6 +64,20 @@ static bool process_event(const SDL_Event *event,
 }
 int main(int argc, char *args[])
 {
+    /* Load .ray map file if provided, otherwise use compiled-in defaults */
+    Game game;
+    if (argc > 1) {
+        MapConfig mapCfg;
+        if (!MapConfigLoad(args[1], &mapCfg)) {
+            fprintf(stderr, "Failed to load map: %s\n", args[1]);
+            return 1;
+        }
+        MapRuntimeInstall(&mapCfg);
+        game = GameConstructAt(mapCfg.spawnX, mapCfg.spawnY, mapCfg.spawnA);
+    } else {
+        game = GameConstruct();
+    }
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     } else {
@@ -76,7 +91,6 @@ int main(int argc, char *args[])
             printf("Window could not be created! SDL_Error: %s\n",
                    SDL_GetError());
         } else {
-            Game game;
             RayCaster *floatCaster = RayCasterFloatConstruct();
             Renderer floatRenderer = RendererConstruct(floatCaster);
             uint32_t floatBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];

@@ -1,0 +1,15 @@
+T_N assets/textures/north.png
+T_S assets/textures/south.png
+T_W assets/textures/west.png
+T_E assets/textures/east.png
+F 40,40,40
+C 100,100,200
+
+1111111111
+1000000001
+1000000001
+1000N00001
+1000000001
+1000000001
+1000000001
+1111111111

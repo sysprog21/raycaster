@@ -174,6 +174,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
     uint8_t tileY = rayY >> 8;
     int16_t hitX;
     int16_t hitY;
+    const uint16_t maxSteps = MapWidth() + MapHeight() + 1;
 
     if (angle == 0) {
         switch (quarter % 2) {
@@ -183,7 +184,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             if (tileStepY == 1) {
                 interceptY -= 256;
             }
-            for (uint16_t i = 0; i < MAP_X + MAP_Y + 1; i++) {
+            for (uint16_t i = 0; i < maxSteps; i++) {
                 tileY += tileStepY;
                 if (MapIsWall(tileX, tileY)) {
                     goto HorizontalHit;
@@ -196,7 +197,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             if (tileStepX == 1) {
                 interceptX -= 256;
             }
-            for (uint16_t i = 0; i < MAP_X + MAP_Y + 1; i++) {
+            for (uint16_t i = 0; i < maxSteps; i++) {
                 tileX += tileStepX;
                 if (MapIsWall(tileX, tileY)) {
                     goto VerticalHit;
@@ -244,7 +245,7 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
             break;
         }
 
-        for (uint16_t i = 0; i < MAP_X + MAP_Y + 1; i++) {
+        for (uint16_t i = 0; i < maxSteps; i++) {
             while ((tileStepY == 1 && (interceptY >> 8 < tileY)) ||
                    (tileStepY == -1 && (interceptY >> 8 >= tileY))) {
                 tileX += tileStepX;

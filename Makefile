@@ -1,4 +1,4 @@
-CFLAGS = `sdl2-config --cflags`
+CFLAGS = `sdl2-config --cflags` -DRAYCASTER_HAS_RUNTIME_MAP
 CFLAGS_NATIVE = -std=c99 -O2 -Wall -g
 LDFLAGS = `sdl2-config --libs` -lm
 
@@ -45,6 +45,7 @@ SDL_OBJS := \
 	raycaster_fixed.o \
 	raycaster_float.o \
 	raycaster_data.o \
+	map_parser.o \
 	renderer.o \
 	raycaster_tables.o
 BAREMETAL_OBJS := \
