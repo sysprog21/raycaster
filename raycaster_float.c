@@ -163,8 +163,11 @@ static void RayCasterFloatTrace(RayCaster *rayCaster,
     wallX -= floorf(wallX);
 
     *textureX = (uint8_t) (wallX * 256.0f);
-    // side 0 = crossed X boundary = vertical wall face (darkened by renderer)
-    *textureNo = (side == 0) ? 1 : 0;
+    // Encode NSWE direction from DDA hit side and ray direction
+    if (side == 0)
+        *textureNo = (rayDirX > 0) ? WALL_EAST : WALL_WEST;
+    else
+        *textureNo = (rayDirY > 0) ? WALL_SOUTH : WALL_NORTH;
 
     // Wall height from perpendicular distance
     float tmp = INV_FACTOR / perpWallDist;

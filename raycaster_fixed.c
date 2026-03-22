@@ -27,8 +27,8 @@
 //     dist = ΔY·cos(playerA) + ΔX·sin(playerA)
 //
 //   Hit labels:
-//     HorizontalHit → textureNo=0 (Y-boundary crossing, normal brightness)
-//     VerticalHit   → textureNo=1 (X-boundary crossing, darkened by renderer)
+//     HorizontalHit → Y-boundary crossing → WALL_SOUTH or WALL_NORTH
+//     VerticalHit   → X-boundary crossing → WALL_EAST  or WALL_WEST
 
 #include "raycaster_fixed.h"
 
@@ -269,14 +269,14 @@ static void RayCasterFixedCalculateDistance(uint16_t rayX,
 HorizontalHit:
     hitX = interceptX + (tileStepX == 1 ? 256 : 0);
     hitY = (tileY << 8) + (tileStepY == -1 ? 256 : 0);
-    *textureNo = 0;
+    *textureNo = (tileStepY == 1) ? WALL_SOUTH : WALL_NORTH;
     *textureX = interceptX & 0xFF;
     goto WallHit;
 
 VerticalHit:
     hitX = (tileX << 8) + (tileStepX == -1 ? 256 : 0);
     hitY = interceptY + (tileStepY == 1 ? 256 : 0);
-    *textureNo = 1;
+    *textureNo = (tileStepX == 1) ? WALL_EAST : WALL_WEST;
     *textureX = interceptY & 0xFF;
     goto WallHit;
 

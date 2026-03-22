@@ -26,6 +26,15 @@
 #define ABS(x) (x < 0 ? -x : x)
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
+/* Wall face direction: which compass face the ray hit.
+ * North/South = Y-boundary crossings (normal brightness).
+ * East/West   = X-boundary crossings (darkened by renderer).
+ */
+#define WALL_NORTH 0
+#define WALL_SOUTH 1
+#define WALL_EAST 2
+#define WALL_WEST 3
+
 typedef struct RayCaster {
     void *derived;
 

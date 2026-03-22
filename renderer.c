@@ -89,8 +89,8 @@ void RendererTraceFrame(Renderer *renderer, Game *g, uint32_t *fb)
 
             to += ts;
 
-            if (tn == 1 && tv > 0) {
-                // dark wall
+            if (tn >= WALL_EAST && tv > 0) {
+                // dark wall (East/West faces = X-boundary crossings)
                 tv = ((uint8_t) (tv >> 24) << 24) |
                      (((uint8_t) (tv >> 16) >> 1) << 16) |
                      (((uint8_t) (tv >> 8) >> 1) << 8) |
