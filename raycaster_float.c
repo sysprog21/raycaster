@@ -1,33 +1,52 @@
-// floating-point implementation for testing/comparison
+// DDA + camera-plane floating-point raycaster
 //
-// This diagram shows the coordinate system used in the
-// RayCasterFloat::Distance() function.
+// Clean DDA implementation with camera-plane FOV representation.
+// Zero dependency on precomputed tables. Perpendicular distance
+// eliminates fisheye without cos(deltaAngle) correction.
 //
-//              ^ rayA/
-//     sin-     |    /   sin+
-//     cos+     |   /    cos+
-//     tan-     |  /     tan+
-//              | /
-//              |/
-// ---------------------------->
-//              |
-//     sin-     |        sin+
-//     cos-     |        cos-
-//     tan+     |        tan-
-//              |
+// Coordinate system and camera geometry:
+//
+//            North (512, -Y)
+//                 ▲
+//                 │
+//   West (768) ◄──┼──► East (256, +X)
+//                 │
+//                 ▼
+//            South (0, +Y)
+//
+//   playerA increases: South(0) → East(256) → North(512) → West(768)
+//                    = counter-clockwise in world coordinates
+//
+//   dir   = (sin(a), cos(a))       — unit direction vector
+//   plane = (cos(a), -sin(a)) * K  — camera plane, ⊥ to dir
+//
+//        plane
+//   ◄─── ● ───►   screenX=0 is left, screenX=W-1 is right
+//        │
+//        │ dir
+//        ▼
+//
+// The 3D view is left-right mirrored (standard raycaster convention).
+// Camera plane orientation preserves this: right-world renders on left-screen.
 
 #include "raycaster_float.h"
 #include <math.h>
 #include <stdlib.h>
 
-#define P2P_DISTANCE(x1, y1, x2, y2)              \
-    sqrt((float) (((x1) - (x2)) * ((x1) - (x2)) + \
-                  ((y1) - (y2)) * ((y1) - (y2))))
+// Camera plane magnitude: FOV = 2 * atan(PLANE_MAG) ~ 76 degrees.
+// Matches the original deltaAngle formula: atanf(t * pi/4).
+#define PLANE_MAG ((float) M_PI / 4.0f)
+
+// Reciprocal cap for near-zero ray direction components (avoids infinity)
+#define RECIP_CAP 1e30f
 
 typedef struct {
-    float playerX;
-    float playerY;
-    float playerA;
+    float posX;
+    float posY;
+    float dirX;
+    float dirY;
+    float planeX;
+    float planeY;
 } RayCasterFloat;
 
 static void RayCasterFloatTrace(RayCaster *rayCaster,
@@ -62,125 +81,6 @@ RayCaster *RayCasterFloatConstruct(void)
     return rayCaster;
 }
 
-/* Wrapper to use shared MapIsWall with float coordinates */
-static bool RayCasterFloatIsWall(float rayX, float rayY)
-{
-    int tileX = (int) rayX;
-    int tileY = (int) rayY;
-    /* Bounds check before uint8_t cast to prevent wrap-around */
-    if (tileX < 0 || tileY < 0 || tileX >= MAP_X - 1 || tileY >= MAP_Y - 1)
-        return true;
-    return MapIsWall((uint8_t) tileX, (uint8_t) tileY);
-}
-
-static float RayCasterFloatDistance(float playerX,
-                                    float playerY,
-                                    float rayA,
-                                    float *hitOffset,
-                                    int *hitDirection)
-{
-    while (rayA < 0) {
-        rayA += 2.0f * M_PI;
-    }
-    while (rayA >= 2.0f * M_PI) {
-        rayA -= 2.0f * M_PI;
-    }
-
-    float sinA = sinf(rayA);
-    float cosA = cosf(rayA);
-    float rayX, rayY, vx, vy;
-    float xOffset, yOffset, vertHitDis, horiHitDis;
-    int depth = 0;
-    /* Use map diagonal as max search depth */
-    const int maxDepth = MAP_X + MAP_Y;
-    /* Initialize to large value so no-hit returns max distance */
-    const float noHitDist = (float) (MAP_X + MAP_Y);
-    /* Epsilon for near-axis ray detection (avoids division by zero) */
-    const float slopeEps = 0.001f;
-
-    // Check for vertical hit (compute cotA only when needed)
-    depth = 0;
-    vertHitDis = noHitDist;
-    if (sinA > slopeEps) {  // rayA pointing rightward
-        float cotA = cosA / sinA;
-        rayX = (int) playerX + 1;
-        rayY = (rayX - playerX) * cotA + playerY;
-        xOffset = 1;
-        yOffset = xOffset * cotA;
-    } else if (sinA < -slopeEps) {  // rayA pointing leftward
-        float cotA = cosA / sinA;
-        rayX = (int) playerX - 0.001;
-        rayY = (rayX - playerX) * cotA + playerY;
-        xOffset = -1;
-        yOffset = xOffset * cotA;
-    } else {  // rayA pointing up or down
-        rayX = playerX;
-        rayY = playerY;
-        xOffset = 0;
-        yOffset = 0;
-        depth = maxDepth;
-    }
-
-    while (depth < maxDepth) {
-        if (RayCasterFloatIsWall(rayX, rayY)) {
-            vertHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
-            break;
-        } else {
-            rayX += xOffset;
-            rayY += yOffset;
-            depth += 1;
-        }
-    }
-    vx = rayX;
-    vy = rayY;
-
-    // Check for horizontal hit (compute tanA only when needed)
-    depth = 0;
-    horiHitDis = noHitDist;
-    if (cosA > slopeEps) {  // rayA pointing upward
-        float tanA = sinA / cosA;
-        rayY = (int) playerY + 1;
-        rayX = (rayY - playerY) * tanA + playerX;
-        yOffset = 1;
-        xOffset = yOffset * tanA;
-    } else if (cosA < -slopeEps) {  // rayA pointing downward
-        float tanA = sinA / cosA;
-        rayY = (int) playerY - 0.001;
-        rayX = (rayY - playerY) * tanA + playerX;
-        yOffset = -1;
-        xOffset = yOffset * tanA;
-    } else {  // rayA pointing leftward or rightward
-        rayX = playerX;
-        rayY = playerY;
-        xOffset = 0;
-        yOffset = 0;
-        depth = maxDepth;
-    }
-
-    while (depth < maxDepth) {
-        if (RayCasterFloatIsWall(rayX, rayY)) {
-            horiHitDis = P2P_DISTANCE(playerX, playerY, rayX, rayY);
-            break;
-        } else {
-            rayX += xOffset;
-            rayY += yOffset;
-            depth += 1;
-        }
-    }
-
-    if (vertHitDis < horiHitDis) {  // Vertical hit
-        rayX = vx;
-        rayY = vy;
-        *hitDirection = true;
-        *hitOffset = rayY;
-    } else {  // Horizontal hit
-        *hitDirection = false;
-        *hitOffset = rayX;
-    }
-
-    return fmin(vertHitDis, horiHitDis);
-}
-
 static void RayCasterFloatTrace(RayCaster *rayCaster,
                                 uint16_t screenX,
                                 uint8_t *screenY,
@@ -189,36 +89,93 @@ static void RayCasterFloatTrace(RayCaster *rayCaster,
                                 uint16_t *textureY,
                                 uint16_t *textureStep)
 {
-    float hitOffset;
-    int hitDirection;
-    float deltaAngle = atanf(((int16_t) screenX - SCREEN_WIDTH / 2.0f) /
-                             (SCREEN_WIDTH / 2.0f) * M_PI / 4);
-    float lineDistance = RayCasterFloatDistance(
-        ((RayCasterFloat *) (rayCaster->derived))->playerX,
-        ((RayCasterFloat *) (rayCaster->derived))->playerY,
-        ((RayCasterFloat *) (rayCaster->derived))->playerA + deltaAngle,
-        &hitOffset, &hitDirection);
-    float distance = lineDistance * cos(deltaAngle);
-    float dum;
-    *textureX = (uint8_t) (256.0f * modff(hitOffset, &dum));
-    *textureNo = hitDirection;
-    *textureY = 0;
-    *textureStep = 0;
-    if (distance > 0) {
-        float tmp = INV_FACTOR / distance;
-        *screenY = tmp;
-        float txs = (tmp * 2.0f);
-        if (txs != 0) {
-            *textureStep = (256 / txs) * 256;
-            if (txs > SCREEN_HEIGHT) {
-                float wallHeight = (txs - SCREEN_HEIGHT) / 2;
-                *textureY = wallHeight * (256 / txs) * 256;
-                *screenY = HORIZON_HEIGHT;
-            }
-        }
+    RayCasterFloat *self = rayCaster->derived;
+
+    // Camera-plane ray generation (no trig per ray)
+    float cameraX = 2.0f * screenX / (float) SCREEN_WIDTH - 1.0f;
+    float rayDirX = self->dirX + self->planeX * cameraX;
+    float rayDirY = self->dirY + self->planeY * cameraX;
+
+    int mapX = (int) self->posX;
+    int mapY = (int) self->posY;
+
+    // Distance ray must travel to cross one X or Y grid line
+    float deltaDX = fabsf(rayDirX) < 1e-30f ? RECIP_CAP : fabsf(1.0f / rayDirX);
+    float deltaDY = fabsf(rayDirY) < 1e-30f ? RECIP_CAP : fabsf(1.0f / rayDirY);
+
+    // Step direction and initial side distances
+    int stepX, stepY;
+    float sideDX, sideDY;
+
+    if (rayDirX < 0) {
+        stepX = -1;
+        sideDX = (self->posX - mapX) * deltaDX;
     } else {
-        *screenY = 0;
+        stepX = 1;
+        sideDX = (mapX + 1.0f - self->posX) * deltaDX;
     }
+    if (rayDirY < 0) {
+        stepY = -1;
+        sideDY = (self->posY - mapY) * deltaDY;
+    } else {
+        stepY = 1;
+        sideDY = (mapY + 1.0f - self->posY) * deltaDY;
+    }
+
+    // DDA: single loop, no trig inside
+    int side;
+    int hit = 0;
+    while (!hit) {
+        if (sideDX < sideDY) {
+            sideDX += deltaDX;
+            mapX += stepX;
+            side = 0;
+        } else {
+            sideDY += deltaDY;
+            mapY += stepY;
+            side = 1;
+        }
+        if (mapX < 0 || mapX >= MAP_X - 1 || mapY < 0 || mapY >= MAP_Y - 1)
+            hit = 1;
+        else if (MapIsWall((uint8_t) mapX, (uint8_t) mapY))
+            hit = 1;
+    }
+
+    // Perpendicular distance (fisheye-free, no cos correction needed).
+    // Clamp to small positive value: when the player sits exactly on a grid
+    // boundary the distance is 0, but the wall should fill the screen.
+    float perpWallDist;
+    if (side == 0)
+        perpWallDist = (mapX - self->posX + (1 - stepX) / 2.0f) / rayDirX;
+    else
+        perpWallDist = (mapY - self->posY + (1 - stepY) / 2.0f) / rayDirY;
+    if (perpWallDist < 1e-4f)
+        perpWallDist = 1e-4f;
+
+    // Texture X coordinate from hit position
+    float wallX;
+    if (side == 0)
+        wallX = self->posY + perpWallDist * rayDirY;
+    else
+        wallX = self->posX + perpWallDist * rayDirX;
+    wallX -= floorf(wallX);
+
+    *textureX = (uint8_t) (wallX * 256.0f);
+    // side 0 = crossed X boundary = vertical wall face (darkened by renderer)
+    *textureNo = (side == 0) ? 1 : 0;
+
+    // Wall height from perpendicular distance
+    float tmp = INV_FACTOR / perpWallDist;
+    float txs = tmp * 2.0f;
+    *textureY = 0;
+    if (txs > SCREEN_HEIGHT) {
+        float wallHeight = (txs - SCREEN_HEIGHT) / 2.0f;
+        *textureY = (uint16_t) (wallHeight * (256.0f / txs) * 256.0f);
+        *screenY = HORIZON_HEIGHT;
+    } else {
+        *screenY = (uint8_t) tmp;
+    }
+    *textureStep = (txs > 0) ? (uint16_t) ((256.0f / txs) * 256.0f) : 0;
 }
 
 static void RayCasterFloatStart(RayCaster *rayCaster,
@@ -226,12 +183,19 @@ static void RayCasterFloatStart(RayCaster *rayCaster,
                                 uint16_t playerY,
                                 int16_t playerA)
 {
-    ((RayCasterFloat *) (rayCaster->derived))->playerX =
-        (playerX / 1024.0f) * 4.0f;
-    ((RayCasterFloat *) (rayCaster->derived))->playerY =
-        (playerY / 1024.0f) * 4.0f;
-    ((RayCasterFloat *) (rayCaster->derived))->playerA =
-        (playerA / 1024.0f) * 2.0f * M_PI;
+    RayCasterFloat *self = rayCaster->derived;
+
+    self->posX = playerX / 256.0f;
+    self->posY = playerY / 256.0f;
+
+    float angle = playerA / 1024.0f * 2.0f * (float) M_PI;
+    self->dirX = sinf(angle);
+    self->dirY = cosf(angle);
+
+    // Camera plane perpendicular to direction, derived from dir vector.
+    // Plane orientation (dirY, -dirX) preserves the mirrored 3D view.
+    self->planeX = self->dirY * PLANE_MAG;
+    self->planeY = -self->dirX * PLANE_MAG;
 }
 
 static void RayCasterFloatDestruct(RayCaster *rayCaster)
